@@ -142,68 +142,16 @@ class LMMClient:
         Returns:
             Formatted prompt string
         """
-        # The detailed prompt instructions are crucial for the quality of chunking
-        # This is a simplified version; the full version would be more comprehensive
-        
-        # First part: Task description
-        task_description = """
-You are an expert document analyzer that can see both text and visual layout in document pages. 
-Your task is to intelligently chunk these document pages into meaningful, contextually rich segments.
-
-Unlike traditional text-only chunking, you will use your visual understanding to:
-1. Respect document layout (columns, tables, headers, footers)
-2. Preserve logical content boundaries (paragraphs, sections, lists)
-3. Maintain continuity across pages
-4. Keep related elements together (table rows with headers, lists items)
-"""
-
-        # Second part: Context information
-        context_section = ""
-        if context.summary or context.last_chunk or context.heading_hierarchy:
-            context_section = """
-PREVIOUS CONTEXT:
-"""
-            if context.summary:
-                context_section += f"Summary of previous pages: {context.summary}\n\n"
+        # Load the exact prompt from prompt.txt without any modifications
+        try:
+            prompt_file = Path(__file__).parent.parent / "prompt.txt"
+            with open(prompt_file, 'r') as f:
+                full_prompt = f.read()
             
-            if context.heading_hierarchy:
-                context_section += f"Current heading hierarchy: {' > '.join(context.heading_hierarchy)}\n\n"
-                
-            if context.last_chunk:
-                context_section += f"Last chunk from previous pages: {context.last_chunk}\n\n"
-
-        # Third part: Chunk formatting instructions
-        format_instructions = """
-OUTPUT FORMAT:
-For each chunk, output in the following format:
-
-[CHUNK]
-[HEADING_HIERARCHY]Document Title > Section > Subsection[/HEADING_HIERARCHY]
-[CONTENT]
-The actual content of the chunk goes here. This should be a cohesive, meaningful unit.
-[/CONTENT]
-[CONTINUES]True|False|Partial[/CONTINUES]
-[/CHUNK]
-
-CHUNKING RULES:
-1. Create logical chunks that preserve meaning and context
-2. Include heading hierarchy for each chunk
-3. Mark each chunk with a continuation flag:
-   - [CONTINUES]True[/CONTINUES] - This chunk continues from the previous one
-   - [CONTINUES]False[/CONTINUES] - This chunk starts a new topic/section
-   - [CONTINUES]Partial[/CONTINUES] - Uncertain relationship
-
-SPECIAL HANDLING:
-- Tables: Create one chunk per row, but include column headers in EACH row chunk
-- Lists: Keep all items in a list together in one chunk
-- Images: Include descriptive text about the image and its caption
-- Headers/Footers: Exclude page numbers and repeating headers/footers
-- Math/Equations: Keep equations intact with their surrounding context
-"""
-
-        # Combine all parts
-        full_prompt = task_description + context_section + format_instructions
-        
+        except Exception as e:
+            logger.error(f"Could not read prompt.txt: {e}. This is required for proper chunking.")
+            raise
+            
         return full_prompt
     
     def _prepare_image(self, image: Union[Image.Image, bytes, str]) -> Union[str, Image.Image]:

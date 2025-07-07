@@ -18,7 +18,7 @@
         {
             "label": "Run Example (Sample PDF)",
             "type": "shell",
-            "command": "python example.py ${workspaceFolder}/data/sample.pdf --output ${workspaceFolder}/output",
+            "command": "python simple_chunking.py ${workspaceFolder}/data/sample.pdf --output ${workspaceFolder}/output",
             "group": "test",
             "presentation": {
                 "reveal": "always",

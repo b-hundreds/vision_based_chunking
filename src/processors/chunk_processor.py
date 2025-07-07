@@ -43,6 +43,30 @@ class ChunkProcessor:
             r'\[CONTINUES\](.*?)\[/CONTINUES\]',
             re.DOTALL
         )
+        
+        # Format patterns from prompt.txt
+        self.format_continuation_pattern = re.compile(
+            r'\[CONTINUES\](.*?)\[/CONTINUES\]',
+            re.DOTALL
+        )
+        self.format_heading_pattern = re.compile(
+            r'\[HEAD\](.*?)\[/HEAD\]',
+            re.DOTALL
+        )
+        
+        # Alternative patterns for different formatting
+        self.alt_heading_pattern = re.compile(
+            r'Heading Hierarchy:\s*(.*?)(?:\n|$)',
+            re.DOTALL | re.IGNORECASE
+        )
+        self.alt_content_pattern = re.compile(
+            r'Content:\s*(.*?)(?=\n\s*(?:Continues:|$))',
+            re.DOTALL | re.IGNORECASE
+        )
+        self.alt_continuation_pattern = re.compile(
+            r'Continues:\s*(True|False|Partial)',
+            re.IGNORECASE
+        )
     
     def process(
         self,
@@ -61,11 +85,14 @@ class ChunkProcessor:
         Returns:
             List of validated chunks
         """
-        # Extract chunks from raw output
+        # First try to extract chunks using the [CHUNK] tags (legacy format)
         chunk_matches = self.chunk_pattern.finditer(raw_lmm_output)
         chunks = []
+        chunk_found = False
         
+        # Try primary extraction method first ([CHUNK] tags)
         for i, match in enumerate(chunk_matches):
+            chunk_found = True
             chunk_content = match.group(1)
             
             # Extract components
@@ -111,7 +138,214 @@ class ChunkProcessor:
             
             chunks.append(chunk)
         
+        # If no chunks found with [CHUNK] tags, try the format from prompt.txt
+        if not chunk_found:
+            # Try to extract chunks using the format specified in prompt.txt
+            chunks_from_format = self._extract_chunks_from_format(raw_lmm_output, batch_idx, page_numbers)
+            if chunks_from_format:
+                return chunks_from_format
+            
+            # If still no chunks found, try alternative extraction
+            chunks = self._extract_chunks_alternative(raw_lmm_output, batch_idx, page_numbers)
+            
         logger.info(f"Extracted {len(chunks)} chunks from batch {batch_idx}")
+        return chunks
+    
+    def _extract_chunks_from_format(
+        self,
+        raw_lmm_output: str,
+        batch_idx: int,
+        page_numbers: List[int],
+    ) -> List["Chunk"]:
+        """
+        Extract chunks using the format specified in prompt.txt.
+        
+        Format:
+        [CONTINUES]True|False|Partial[/CONTINUES]
+        [HEAD]main_heading > section_heading > chunk_heading[/HEAD]
+        chunk_content
+        
+        Args:
+            raw_lmm_output: Raw output from the LMM
+            batch_idx: Index of the current batch
+            page_numbers: List of page numbers in the current batch
+            
+        Returns:
+            List of extracted chunks
+        """
+        chunks = []
+        
+        # Split the text by double newlines to find potential chunks
+        sections = re.split(r'\n\s*\n', raw_lmm_output)
+        
+        # Look for patterns of [CONTINUES]...[/CONTINUES] followed by [HEAD]...[/HEAD]
+        chunk_idx = 0
+        for i in range(len(sections)):
+            section = sections[i]
+            
+            # Look for continuation flag
+            continuation_match = self.format_continuation_pattern.search(section)
+            if not continuation_match:
+                continue
+                
+            # Look for heading
+            heading_match = self.format_heading_pattern.search(section)
+            if not heading_match:
+                continue
+                
+            # Extract values
+            continuation_flag = continuation_match.group(1).strip()
+            heading_text = heading_match.group(1).strip()
+            heading_hierarchy = [h.strip() for h in heading_text.split('>')]
+            
+            # Validate continuation flag
+            if continuation_flag not in ["True", "False", "Partial"]:
+                logger.warning(
+                    f"Invalid continuation flag in chunk {chunk_idx}, batch {batch_idx}: {continuation_flag}"
+                )
+                continuation_flag = "False"
+                
+            # Extract content - everything after the heading that's not the continuation flag
+            content_text = section
+            content_text = re.sub(r'\[CONTINUES\].*?\[/CONTINUES\]', '', content_text)
+            content_text = re.sub(r'\[HEAD\].*?\[/HEAD\]', '', content_text)
+            content_text = content_text.strip()
+            
+            # If there's no content in this section, look at the next section
+            if not content_text and i + 1 < len(sections):
+                content_text = sections[i + 1].strip()
+                
+            if content_text:
+                # Create chunk
+                chunk = Chunk(
+                    id=f"b{batch_idx}_c{chunk_idx}_{uuid.uuid4().hex[:8]}",
+                    content=content_text,
+                    heading_hierarchy=heading_hierarchy,
+                    page_numbers=page_numbers,
+                    continuation_flag=continuation_flag,
+                    source_batch=batch_idx,
+                    metadata={
+                        "position_in_batch": chunk_idx,
+                        "raw_length": len(content_text),
+                        "heading_count": len(heading_hierarchy),
+                        "extraction_method": "format",
+                    }
+                )
+                
+                chunks.append(chunk)
+                chunk_idx += 1
+                
+        return chunks
+    
+    def _extract_chunks_alternative(
+        self,
+        raw_lmm_output: str,
+        batch_idx: int,
+        page_numbers: List[int],
+    ) -> List["Chunk"]:
+        """
+        Alternative method to extract chunks from LMM output that doesn't use the explicit [CHUNK] tags.
+        
+        Args:
+            raw_lmm_output: Raw output from the LMM
+            batch_idx: Index of the current batch
+            page_numbers: List of page numbers in the current batch
+            
+        Returns:
+            List of extracted chunks
+        """
+        chunks = []
+        
+        # Try to find chunks separated by headings and newlines
+        # First split the text by double newlines to separate potential chunks
+        lines = raw_lmm_output.split("\n")
+        
+        i = 0
+        while i < len(lines):
+            current_chunk = []
+            heading_hierarchy = None
+            content = ""
+            continuation_flag = "False"
+            
+            # Look for a heading line
+            while i < len(lines) and not heading_hierarchy:
+                line = lines[i].strip()
+                
+                # Check if line looks like a heading hierarchy
+                if ">" in line or "heading" in line.lower() or "hierarchy" in line.lower():
+                    heading_match = self.alt_heading_pattern.search(line)
+                    if heading_match:
+                        heading_text = heading_match.group(1).strip()
+                        heading_hierarchy = [h.strip() for h in heading_text.split('>')]
+                    else:
+                        # Try to extract hierarchy from the line itself
+                        if ">" in line:
+                            potential_hierarchy = [h.strip() for h in line.split('>')]
+                            if len(potential_hierarchy) >= 2:
+                                heading_hierarchy = potential_hierarchy
+                
+                i += 1
+            
+            # If we found a heading, look for content
+            if heading_hierarchy:
+                content_lines = []
+                
+                # Collect lines until we find something that looks like a continuation flag
+                # or the next heading
+                while i < len(lines):
+                    line = lines[i].strip()
+                    
+                    # Check if this looks like a continuation flag
+                    if ("continue" in line.lower() or "continues" in line.lower()) and \
+                       ("true" in line.lower() or "false" in line.lower() or "partial" in line.lower()):
+                        continuation_match = self.alt_continuation_pattern.search(line)
+                        if continuation_match:
+                            continuation_flag = continuation_match.group(1)
+                        else:
+                            # Try to extract directly
+                            if "true" in line.lower():
+                                continuation_flag = "True"
+                            elif "false" in line.lower():
+                                continuation_flag = "False"
+                            elif "partial" in line.lower():
+                                continuation_flag = "Partial"
+                        
+                        i += 1
+                        break
+                    
+                    # Check if this looks like the next heading
+                    if ">" in line or "heading" in line.lower() or "hierarchy" in line.lower():
+                        heading_match = self.alt_heading_pattern.search(line)
+                        if heading_match or (i < len(lines) - 1 and "content" in lines[i+1].lower()):
+                            # This is probably the next heading
+                            break
+                    
+                    content_lines.append(line)
+                    i += 1
+                
+                # Create a chunk with what we've found
+                content = "\n".join(content_lines).strip()
+                
+                if content:  # Only create chunk if we have content
+                    chunk = Chunk(
+                        id=f"b{batch_idx}_c{len(chunks)}_{uuid.uuid4().hex[:8]}",
+                        content=content,
+                        heading_hierarchy=heading_hierarchy,
+                        page_numbers=page_numbers,
+                        continuation_flag=continuation_flag,
+                        source_batch=batch_idx,
+                        metadata={
+                            "position_in_batch": len(chunks),
+                            "raw_length": len(content),
+                            "heading_count": len(heading_hierarchy),
+                            "extraction_method": "alternative",
+                        }
+                    )
+                    chunks.append(chunk)
+            else:
+                # If we didn't find a heading, move on
+                i += 1
+        
         return chunks
     
     def post_process_all(self, chunks: List["Chunk"]) -> List["Chunk"]:
@@ -191,9 +425,9 @@ class ChunkProcessor:
             "original_continuation_flag": chunk2.continuation_flag,
         })
         
-        # Create merged chunk
+        # Create merged chunk with a shorter ID to avoid filename length issues
         return Chunk(
-            id=f"merged_{chunk1.id}_{chunk2.id}",
+            id=f"m{chunk1.source_batch}_{uuid.uuid4().hex[:8]}",
             content=combined_content,
             heading_hierarchy=heading_hierarchy,
             page_numbers=page_numbers,

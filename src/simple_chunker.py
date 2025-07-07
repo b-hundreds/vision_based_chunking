@@ -142,9 +142,23 @@ class SimpleVisionChunker:
         
         output_dir.mkdir(parents=True, exist_ok=True)
         
+        # Maximum safe filename length (varies by filesystem, but 255 is common)
+        MAX_FILENAME_LENGTH = 200
+        
         # Save individual chunks
         for chunk in chunks:
-            chunk_file = output_dir / f"chunk_{chunk.id}.json"
+            # Generate filename with safety check for length
+            filename = f"chunk_{chunk.id}.json"
+            
+            # If filename is too long, truncate it and use a hash instead
+            if len(filename) > MAX_FILENAME_LENGTH:
+                import hashlib
+                # Create a hash of the original ID to ensure uniqueness
+                id_hash = hashlib.md5(chunk.id.encode()).hexdigest()[:16]
+                filename = f"chunk_s{chunk.source_batch}_{id_hash}.json"
+                logger.warning(f"Filename too long, shortened to: {filename}")
+            
+            chunk_file = output_dir / filename
             with open(chunk_file, 'w') as f:
                 # Convert dataclass to dict
                 chunk_dict = {
