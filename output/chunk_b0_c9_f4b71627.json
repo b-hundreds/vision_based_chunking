@@ -1,0 +1,24 @@
+{
+  "id": "b0_c9_f4b71627",
+  "content": "Figure 3: Modulating the position of relevant information within the input context for the multi-document question answering example presented in Figure 2. Reordering the documents in the input context does not affect the desired output.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "2 Multi-Document Question Answering"
+  ],
+  "page_numbers": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "continuation_flag": "False",
+  "source_batch": 0,
+  "metadata": {
+    "position_in_batch": 9,
+    "raw_length": 572,
+    "heading_count": 2,
+    "validation_warnings": [
+      "This chunk's heading appears on non-consecutive page ranges: 1, 1, 1-2, 2, 2-3, 3, 3-4, 4, 4-8"
+    ]
+  }
+}

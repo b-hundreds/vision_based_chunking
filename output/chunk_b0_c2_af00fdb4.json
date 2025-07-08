@@ -1,0 +1,23 @@
+{
+  "id": "b0_c2_af00fdb4",
+  "content": "Figure 1: Changing the location of relevant information (in this case, the position of the passage that answers an input question) within the language model\u2019s input context results in a U-shaped performance curve\u2014models are better at using relevant information that occurs at the very beginning (primacy bias) or end of the input context (recency bias), and performance degrades significantly when models must access and use information located in the middle of its input context.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts"
+  ],
+  "page_numbers": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "continuation_flag": "False",
+  "source_batch": 0,
+  "metadata": {
+    "position_in_batch": 2,
+    "raw_length": 990,
+    "heading_count": 1,
+    "validation_warnings": [
+      "This chunk's heading appears on non-consecutive page ranges: 1, 1-2, 2-3, 3-4, 4"
+    ]
+  }
+}

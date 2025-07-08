@@ -127,10 +127,24 @@ class LMMClient:
         images = [self._prepare_image(page.image) for page in batch_pages]
         
         # Call appropriate API based on model type
+        batch_info = f"Batch with pages {[page.page_number for page in batch_pages]}"
+        logger.info(f"Sending {len(images)} page images to LMM for {batch_info}")
+        
         if "gemini" in self.model_name.lower():
-            return self._call_gemini_api(prompt, images)
+            response = self._call_gemini_api(prompt, images)
         else:
-            return self._call_openai_api(prompt, images)
+            response = self._call_openai_api(prompt, images)
+        
+        # Log stats about the response to help with debugging
+        chunk_count = response.count("[CHUNK]")
+        logger.info(f"Received LMM response with {len(response)} characters and {chunk_count} chunk markers")
+        
+        # Check if the response seems valid
+        if chunk_count == 0:
+            logger.warning(f"No [CHUNK] markers found in LMM response for {batch_info}")
+            logger.debug(f"Response snippet: {response[:500]}...")
+        
+        return response
     
     def _create_prompt(self, context: Context) -> str:
         """
@@ -155,6 +169,13 @@ Unlike traditional text-only chunking, you will use your visual understanding to
 2. Preserve logical content boundaries (paragraphs, sections, lists)
 3. Maintain continuity across pages
 4. Keep related elements together (table rows with headers, lists items)
+
+IMPORTANT: You MUST return ALL content from the pages as properly formatted chunks, even if the content seems unimportant.
+Every page needs to be processed and returned as at least one chunk. Do not skip any content.
+
+CRUCIAL INSTRUCTION ABOUT HEADINGS: For each chunk, you MUST use the heading hierarchy that's ACTUALLY VISIBLE on the current pages. 
+DO NOT use headings from previous pages unless they are the current active section headings. 
+Each heading in the hierarchy should be from the current section structure visible in these pages.
 """
 
         # Second part: Context information
@@ -167,7 +188,8 @@ PREVIOUS CONTEXT:
                 context_section += f"Summary of previous pages: {context.summary}\n\n"
             
             if context.heading_hierarchy:
-                context_section += f"Current heading hierarchy: {' > '.join(context.heading_hierarchy)}\n\n"
+                context_section += f"Heading hierarchy from previous pages: {' > '.join(context.heading_hierarchy)}\n"
+                context_section += "IMPORTANT: Only use this previous heading hierarchy if it's still relevant to the current pages. If the current pages start a new section with new headings, use those instead.\n\n"
                 
             if context.last_chunk:
                 context_section += f"Last chunk from previous pages: {context.last_chunk}\n\n"
@@ -185,9 +207,18 @@ The actual content of the chunk goes here. This should be a cohesive, meaningful
 [CONTINUES]True|False|Partial[/CONTINUES]
 [/CHUNK]
 
+YOU MUST use the EXACT tags shown above, with the square brackets. Each chunk must have:
+1. A [CHUNK] opening tag and [/CHUNK] closing tag
+2. A [HEADING_HIERARCHY] section with proper hierarchy (even if it's just the document title)
+   - This MUST reflect the actual headings visible on these specific pages
+   - Do NOT carry over headings from previous pages unless they are still the active section headings
+   - If you can't determine the heading, use "Unknown Section" or the document title
+3. A [CONTENT] section with the actual text content
+4. A [CONTINUES] flag indicating if this chunk continues from a previous one
+
 CHUNKING RULES:
 1. Create logical chunks that preserve meaning and context
-2. Include heading hierarchy for each chunk
+2. Include heading hierarchy for each chunk based on the VISIBLE headings on the current pages
 3. Mark each chunk with a continuation flag:
    - [CONTINUES]True[/CONTINUES] - This chunk continues from the previous one
    - [CONTINUES]False[/CONTINUES] - This chunk starts a new topic/section
@@ -199,6 +230,10 @@ SPECIAL HANDLING:
 - Images: Include descriptive text about the image and its caption
 - Headers/Footers: Exclude page numbers and repeating headers/footers
 - Math/Equations: Keep equations intact with their surrounding context
+
+IF THE PAGE HAS ONLY FIGURES/TABLES: Still create a chunk for each figure or table, with a description of what the figure/table contains.
+
+AGAIN, MAKE SURE EVERY PAGE IS REPRESENTED IN AT LEAST ONE CHUNK, AND USE THE EXACT TAG FORMAT AS SHOWN ABOVE.
 """
 
         # Combine all parts

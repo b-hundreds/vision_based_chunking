@@ -1,0 +1,22 @@
+{
+  "id": "b3_c4_dea2a652",
+  "content": "C Randomizing Distractor Order in Multi-Document QA Our prompt instructs the language model to use the provided search results to answer the question. There may be a prior in the pre-training or instruction fine-tuning data to treat search results as sorted by decreasing relevance (i.e., the documents near the beginning of the input context are more likely to be useful than those at the end). To validate that our conclusions are not simply a byproduct of this bias, we run experiments with the modified instruction \u201cWrite a high-quality answer for the given question using only the provided search results (some of which might be irrelevant). The search results are ordered randomly.\u201d In addition, we randomly shuffle the k \u2212 1 distractor documents. Figure 14: Language model performance when randomizing the order of the distractors, rather than presenting them in order of decreasing relevance) and mentioning as such in the prompt. Figure 14 presents the results of this experiment. We continue to see a U-shaped performance curve, with performance degrading when language models must use information in the middle of their input contexts. Comparing the results in \u00a72.3 with those when randomizing the distractor order and mentioning as such in the prompt, we see that randomization slightly decreases performance when the relevant information is at the very beginning of the context, and slightly increases performance when using information in the middle and end of the context.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "Appendix",
+    "C Randomizing Distractor Order in Multi-Document QA"
+  ],
+  "page_numbers": [
+    13,
+    14,
+    15,
+    16
+  ],
+  "continuation_flag": "False",
+  "source_batch": 3,
+  "metadata": {
+    "position_in_batch": 4,
+    "raw_length": 2025,
+    "heading_count": 3
+  }
+}

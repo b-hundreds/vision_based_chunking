@@ -1,0 +1,21 @@
+{
+  "id": "b2_c1_9548a0ff",
+  "content": "Figure 10: Multi-document QA performance of MPT-30B-Instruct compared against its base model (i.e., before instruction fine-tuning) MPT-30B. Both models have a U-shaped performance curve, where performance is much higher when relevant information occurs at the start or end of the input context, indicating that the instruction fine-tuning process itself is not necessarily responsible for these performance trends. A line graph showing Accuracy on the y-axis (from 44 to 56) versus Position of Document with the Answer on the x-axis (1st, 5th, 10th, 15th, 20th). There are two lines: 'mpt-30b' and 'mpt-30b-instruct'. Both lines show a U-shaped curve, with the highest accuracy at the 1st and 20th positions and the lowest accuracy around the 10th position. The 'mpt-30b-instruct' line is consistently above the 'mpt-30b' line, indicating higher accuracy.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "1 Introduction"
+  ],
+  "page_numbers": [
+    9,
+    10,
+    11,
+    12
+  ],
+  "continuation_flag": "False",
+  "source_batch": 2,
+  "metadata": {
+    "position_in_batch": 1,
+    "raw_length": 857,
+    "heading_count": 2
+  }
+}

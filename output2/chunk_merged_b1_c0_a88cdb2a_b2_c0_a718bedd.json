@@ -1,0 +1,30 @@
+{
+  "id": "merged_b1_c0_a88cdb2a_b2_c0_a718bedd",
+  "content": "Figure 5: The effect of changing the position of relevant information (document containing the answer) on multi-document question answering performance. Lower positions are closer to the start of the input context. Performance is highest when relevant information occurs at the very start or end of the context, and rapidly degrades when models must reason over information in the middle of their input context. and answers. To better understand the effect of additional fine-tuning and model scale, we also experimented with Llama-2 models of varying sizes (7B, 13B, and 70B) with and without additional supervised fine-tuning and reinforcement learning from human feedback (Appendix E). We find that the U-shaped performance curve only appears in sufficiently large language models (with or without additional fine-tuning)\u2014the 7B Llama-2 model was solely recency biased, while the 13B and 70B models exhibit a U-shaped performance curve. In addition, we see that the Llama-2 supervised fine-tuning and reinforcement learning from human feedback procedure slightly mitigates the positional bias in smaller models (13B, akin to trends shown when comparing MPT-30B and MPT-30B-Instruct), but minimally affects trends on larger models (70B).",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "1 Introduction"
+  ],
+  "page_numbers": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "continuation_flag": "False",
+  "source_batch": 1,
+  "metadata": {
+    "position_in_batch": 0,
+    "raw_length": 411,
+    "heading_count": 2,
+    "merged_from": [
+      "b1_c0_a88cdb2a",
+      "b2_c0_a718bedd"
+    ],
+    "original_continuation_flag": "True"
+  }
+}

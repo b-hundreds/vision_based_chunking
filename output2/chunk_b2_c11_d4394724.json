@@ -1,0 +1,21 @@
+{
+  "id": "b2_c11_d4394724",
+  "content": "7 Conclusion We empirically study how language models use long input contexts via a series of controlled experiments. We show that language model performance degrades significantly when changing the position of relevant information, indicating that models struggle to robustly access and use information in long input contexts. In particular, performance is often lowest when models must use information in the middle of long input contexts. We conduct a preliminary investigation of the role of (i) model architecture, (ii) query-aware contextualization, and (iii) instruction fine-tuning to better understand how they affect how language models use context. Finally, we conclude with a practical case study of open-domain question answering, finding that the performance of language model readers saturates far before retriever recall. Our results and analysis provide a better understanding of how language models use their input context and provides new evaluation protocols for future long-context models.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "7 Conclusion"
+  ],
+  "page_numbers": [
+    9,
+    10,
+    11,
+    12
+  ],
+  "continuation_flag": "False",
+  "source_batch": 2,
+  "metadata": {
+    "position_in_batch": 11,
+    "raw_length": 1011,
+    "heading_count": 2
+  }
+}

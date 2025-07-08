@@ -1,0 +1,22 @@
+{
+  "id": "b2_c5_26ed409b",
+  "content": "6.2 How Do Language Models Use Context? The pioneering work of Khandelwal et al. (2018) showed that small LSTM language models make increasingly coarse use of longer-term context; Sankar et al. (2019) found similar results in dialogue models. In a similar vein, Daniiluk et al. (2017) find that attentive LSTM language models tend to mainly use recent history. Petroni et al. (2020) were among the first to demonstrate the potential of combining context from an information retrieval system with a pretrained language model for unsupervised question answering. O\u2019Connor and Andreas (2021) found that many information-destroying operations had marginal effects on Transformer LMs\u2019 predictions. Krishna et al. (2022) found that long-context neural generation in modestly sized Transformer language models degenerates because models fail to properly condition on long context. Finally, studying long-context models, Sun et al. (2021) found that longer contexts improve prediction of only a few tokens, an empirical finding consistent with the theory of Sharan et al. (2018), who showed that sequence distributions with bounded mutual information necessarily lead to marginal average prediction benefits from increasingly long context. Qin et al. (2023) analyze how efficient Transformers perform on a variety of long-context downstream NLP tasks, finding that long-context transformers are recency-biased and do not effectively use long-range context.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "6 Related Work",
+    "6.2 How Do Language Models Use Context?"
+  ],
+  "page_numbers": [
+    9,
+    10,
+    11,
+    12
+  ],
+  "continuation_flag": "False",
+  "source_batch": 2,
+  "metadata": {
+    "position_in_batch": 5,
+    "raw_length": 1449,
+    "heading_count": 3
+  }
+}

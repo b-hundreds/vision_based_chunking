@@ -65,8 +65,11 @@ class ContextManager:
         # This is a simplified implementation; in practice, you might use an LLM to create a summary
         summary = self._create_batch_summary(current_chunks)
         
-        # Extract the latest heading hierarchy
-        heading_hierarchy = last_chunk.heading_hierarchy
+        # Extract the latest heading hierarchy, but with some intelligence
+        heading_hierarchy = self._determine_heading_hierarchy(current_chunks, previous_context)
+        
+        # Get the highest page number from this batch
+        max_page = max(max(chunk.page_numbers) for chunk in current_chunks)
         
         # Create updated context
         return Context(
@@ -74,10 +77,61 @@ class ContextManager:
             last_chunk=last_chunk.content,
             heading_hierarchy=heading_hierarchy,
             metadata={
-                "last_page_processed": max(chunk.page_numbers for chunk in current_chunks),
+                "last_page_processed": max_page,
                 "document_structure": self._extract_document_structure(current_chunks),
+                "current_page_range": [min(min(chunk.page_numbers) for chunk in current_chunks), max_page],
             },
         )
+        
+    def _determine_heading_hierarchy(self, current_chunks: List[Any], previous_context: Context) -> List[str]:
+        """
+        Intelligently determine the appropriate heading hierarchy for the next batch.
+        
+        This method analyzes the current batch to determine if we should:
+        1. Use a heading hierarchy from the current batch
+        2. Carry over the hierarchy from the previous batch
+        3. Reset the hierarchy because we've moved to a new section
+        
+        Args:
+            current_chunks: Chunks from the current batch
+            previous_context: Context from the previous batch
+            
+        Returns:
+            Appropriate heading hierarchy for the next batch
+        """
+        # If the current batch has no chunks, keep the previous hierarchy
+        if not current_chunks:
+            return previous_context.heading_hierarchy
+            
+        # Check if any chunk in this batch has a complete (non-continuation) heading hierarchy
+        complete_hierarchies = [
+            chunk.heading_hierarchy
+            for chunk in current_chunks 
+            if chunk.heading_hierarchy and chunk.continuation_flag != "True"
+        ]
+        
+        # If we have complete hierarchies in this batch, use the last one
+        if complete_hierarchies:
+            return complete_hierarchies[-1]
+        
+        # If we have any hierarchies in this batch, prefer the most specific one
+        all_hierarchies = [chunk.heading_hierarchy for chunk in current_chunks if chunk.heading_hierarchy]
+        if all_hierarchies:
+            # Choose the most specific (longest) hierarchy
+            return max(all_hierarchies, key=len)
+            
+        # If we're still here, we need to decide if we should keep the previous hierarchy
+        # Check if the pages in this batch are continuous with the previous batch
+        if previous_context.metadata and "last_page_processed" in previous_context.metadata:
+            last_page = previous_context.metadata["last_page_processed"]
+            current_first_page = min(min(chunk.page_numbers) for chunk in current_chunks)
+            
+            # If there's a gap of more than 1 page, reset the hierarchy
+            if current_first_page > last_page + 1:
+                return []
+                
+        # If we're on consecutive pages, keep the previous hierarchy
+        return previous_context.heading_hierarchy
     
     def _create_batch_summary(self, chunks: List[Any]) -> str:
         """

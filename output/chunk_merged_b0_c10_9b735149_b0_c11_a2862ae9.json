@@ -1,0 +1,29 @@
+{
+  "id": "merged_b0_c10_9b735149_b0_c11_a2862ae9",
+  "content": "Figure 4: Modulating the input context length of the multi-document question answering example presented in Figure 2. Adding documents that do not contain the answer increases the length of the input context, but does not affect the desired output. Our experimental setup is similar to the needle-in-a-haystack experiments of Ivgi et al. (2023), who compare question answering performance when the relevant paragraph is placed (i) at the beginning of the input or (ii) a random position within the input. They find that encoder-decoder models have significantly higher performance when relevant information is placed at the start of the input context. In contrast, we study finer-grained changes in the position of relevant information.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "2 Multi-Document Question Answering"
+  ],
+  "page_numbers": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "continuation_flag": "False",
+  "source_batch": 0,
+  "metadata": {
+    "position_in_batch": 10,
+    "raw_length": 490,
+    "heading_count": 2,
+    "merged_from": [
+      "b0_c10_9b735149",
+      "b0_c11_a2862ae9"
+    ],
+    "original_continuation_flag": "True",
+    "validation_warnings": [
+      "This chunk's heading appears on non-consecutive page ranges: 1, 1, 1-2, 2, 2-3, 3, 3-4, 4, 4-8"
+    ]
+  }
+}

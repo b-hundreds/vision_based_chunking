@@ -1,0 +1,26 @@
+{
+  "id": "merged_b2_c3_670f6486_b2_c4_227908a7",
+  "content": "5 Is More Context Is Always Better? A Case Study With Open-Domain QA Our results indicate that prompting language models with longer input contexts is a trade-off\u2014providing the language model with more information may help it perform the downstream task, but it also increases the amount of content that the model must reason over, potentially decreasing accuracy. Even if a language model can take in 16K tokens, is it actually beneficial to provide 16K tokens of context? The answer to this question is ultimately downstream task-specific, since it depends on the marginal value of the added context and the model\u2019s ability to effectively use long input contexts, but we perform a case study with open-domain question answering on NaturalQuestions-Open to better understand this trade-off in existing language models. We use language models in a standard retriever-reader setup. A retrieval system (Contriever) fine-tuned on MS-MARCO takes an input query from NaturalQuestions-Open and returns the k documents from Wikipedia with the highest relevance score. In common language models as these retrieved documents, we simply include them in the prompt. We evaluate retriever recall and reader accuracy (whether any of the annotated answers appear in the predicted output) as a function of the number of retrieved documents k. We use a subset of NaturalQuestions-Open where the long answer is a paragraph (as opposed to a table or a list). Figure 11 presents retriever recall and open- crafted IO-aware CUDA kernel. Separately, there are attempts to do away with attention entirely to remove quadratic sequence length complexity, often through convolution and/or linear RNNs, e.g., in RWKV (Peng, 2023), S4 (Gu et al., 2022), or Hyena (Poli et al., 2023). Many prior efforts evaluate perplexity on a diverse web corpus as a proxy for the ability to process long contexts; this work shows that precise knowledge access on long contexts may be an added challenge.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "5 Is More Context Is Always Better? A Case Study With Open-Domain QA"
+  ],
+  "page_numbers": [
+    9,
+    10,
+    11,
+    12
+  ],
+  "continuation_flag": "False",
+  "source_batch": 2,
+  "metadata": {
+    "position_in_batch": 3,
+    "raw_length": 1489,
+    "heading_count": 2,
+    "merged_from": [
+      "b2_c3_670f6486",
+      "b2_c4_227908a7"
+    ],
+    "original_continuation_flag": "True"
+  }
+}

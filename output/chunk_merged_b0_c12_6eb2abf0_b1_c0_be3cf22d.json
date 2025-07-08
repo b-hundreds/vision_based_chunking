@@ -1,0 +1,31 @@
+{
+  "id": "merged_b0_c12_6eb2abf0_b1_c0_be3cf22d",
+  "content": "2.2 Models We analyze several state-of-the-art open and closed language models. We use greedy decoding when generating outputs and leave exploration of other decoding methods to future work. We use a standard set of prompts for each model (Figure 2). Open models. We experiment with MPT-30B-Instruct, which has a maximum context length of 8192 tokens. The model was initially pre-trained on 1 trillion tokens using 2048-token sequences, followed by an additional sequence length adaptation pre-training phase on 50 billion tokens using 8192-token sequences. MPT-30B-Instruct uses ALiBi (Press et al., 2022) to represent positional information. We also evaluate LongChat-13B (16K) (Li et al., 2023), which extends the LLaMA-13B (Touvron et al., 2023a) context window from 2048 to 16384 tokens by using condensed rotary positional embeddings before fine-tuning with 16384-token sequences. Closed models. We use the OpenAI API to experiment with GPT-3.5-Turbo and GPT-3.5-Turbo (16K),5 GPT-3.5-Turbo has a maximum context length of 4K tokens, and GPT-3.5-Turbo (16K) is a version with an extended maximum context length of 16K tokens. We evaluate Claude-1.3 and Claude-1.3 (100K) with the Anthropic API; Claude-1.3 has a maximum context length of 8K tokens, and Claude-1.3 (100K) has an extended context length of 100K tokens.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "2 Multi-Document Question Answering",
+    "2.2 Models"
+  ],
+  "page_numbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "continuation_flag": "False",
+  "source_batch": 0,
+  "metadata": {
+    "position_in_batch": 12,
+    "raw_length": 977,
+    "heading_count": 3,
+    "merged_from": [
+      "b0_c12_6eb2abf0",
+      "b1_c0_be3cf22d"
+    ],
+    "original_continuation_flag": "True"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "b0_c7_d5745425",
+  "content": "2.1 Experimental Setup In the multi-document question answering task, the model inputs are (i) a question to answer and (ii) k documents (e.g., passages from Wikipedia), where exactly one of the documents contains the answer to the question and k \u2212 1 \u201cdistractor\u201d documents do not. This task requires the model to access the document that contains the answer within its input context and use it to answer the question. Figure 2 presents an example. We instantiate this task with data from NaturalQuestions-Open (Lee et al., 2019; Kwiatkowski et al., 2019), which contains historical queries issued to the Google search engine, coupled with human-annotated answers extracted from Wikipedia. In particular, we take the 2655 queries where the annotated long answer is a paragraph (as opposed to a list or a table). We use passages (chunks of at most 100 tokens) from Wikipedia as documents within our input contexts. For each of the queries, we need 1 document that contains the answer and k \u2212 1 distractor documents that do not contain the answer. To obtain a document that answers the question, we use the Wikipedia paragraph that contains the answer from the NaturalQuestions annotations. To collect k \u2212 1 distractor documents that do not contain the answer, we use a retrieval system (Contriever, fine-tuned on MS-MARCO; Izacard et al., 2021) to retrieve the k \u2212 1 Wikipedia chunks that are most relevant to the query and do not contain any of the NaturalQuestions-annotated answers.2,3 In the input context, the distractor documents are presented in order of decreasing relevance.3 To modulate the position of relevant information within the input context, we adjust the order of the documents to change the position of the document that contains the answer (Figure 3). To modulate the input context length in this task, we increase or decrease the number of retrieved documents that do not contain the answer (Figure 4). Following Khandelwal et al. (2022) and Mallen et al. (2023), we use accuracy as our primary evaluation metric, judging whether any of the correct answers (as taken from the NaturalQuestions annotations) appear in the predicted output. --- \u00b9nelsonliu.me/papers/lost-in-the-middle \u00b2Ambiguity in NaturalQuestions-Open means that a small number of distractor passages may contain a reasonable answer. We additionally run experiments on sets of unambiguous questions, finding similar results and conclusions; see Appendix A. \u00b3We also explored using random documents as distractors, see Appendix B for more details. \u00b3Since there could be a prior over \u201csearch results\u201d appearing in ranked order, we explored randomly ordering the k \u2212 1 distractor documents and incorporating that the documents are randomly ordered in the task description, but found the same trends. See Appendix C for more details.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "2 Multi-Document Question Answering",
+    "2.1 Experimental Setup"
+  ],
+  "page_numbers": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "continuation_flag": "False",
+  "source_batch": 0,
+  "metadata": {
+    "position_in_batch": 7,
+    "raw_length": 2822,
+    "heading_count": 3,
+    "validation_warnings": [
+      "This chunk's heading appears on non-consecutive page ranges: 1, 1-2, 2-3, 3-4, 4"
+    ]
+  }
+}

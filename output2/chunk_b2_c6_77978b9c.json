@@ -1,0 +1,22 @@
+{
+  "id": "b2_c6_77978b9c",
+  "content": "6.3 The Serial-Position Effect The U-shaped curve we observe in this work has a connection in psychology known as the serial-position effect (Ebbinghaus, 1913; Murdock Jr, 1962), that states that in free-association recall of elements from a list, humans tend to best remember the first and last elements of the list. The serial-position effect plays a role in understanding how humans develop short- and long-term mem-",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "6 Related Work",
+    "6.3 The Serial-Position Effect"
+  ],
+  "page_numbers": [
+    9,
+    10,
+    11,
+    12
+  ],
+  "continuation_flag": "False",
+  "source_batch": 2,
+  "metadata": {
+    "position_in_batch": 6,
+    "raw_length": 420,
+    "heading_count": 3
+  }
+}

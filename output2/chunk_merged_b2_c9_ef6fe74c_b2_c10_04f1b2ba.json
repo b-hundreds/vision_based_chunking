@@ -1,0 +1,27 @@
+{
+  "id": "merged_b2_c9_ef6fe74c_b2_c10_04f1b2ba",
+  "content": "6 Related Work 6.1 Long-Context Language Models There is much prior work in designing performant language models with cheaper scaling than Transformers in the context length. Many lines of work pursue Transformer variants with attention modifications like recurrence (Dai et al., 2019), factorizing attention into computationally less intensive approximations (Beltagy et al., 2020; Zaheer et al., 2020), or low-rank approximation (Wang et al., 2020; Peng et al., 2021). Dao et al. (2022) instead provide a faster exact attention by a carefully- ory. Observing a serial-position-like effect in language models is perhaps surprising, since the self-attention mechanisms underlying Transformer language models is technically equally capable of retrieving any token from their contexts.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "6 Related Work",
+    "6.1 Long-Context Language Models"
+  ],
+  "page_numbers": [
+    9,
+    10,
+    11,
+    12
+  ],
+  "continuation_flag": "False",
+  "source_batch": 2,
+  "metadata": {
+    "position_in_batch": 9,
+    "raw_length": 547,
+    "heading_count": 3,
+    "merged_from": [
+      "b2_c9_ef6fe74c",
+      "b2_c10_04f1b2ba"
+    ],
+    "original_continuation_flag": "True"
+  }
+}

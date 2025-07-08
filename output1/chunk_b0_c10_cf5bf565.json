@@ -1,0 +1,21 @@
+{
+  "id": "b0_c10_cf5bf565",
+  "content": "2 Multi-Document Question Answering Our goal is to better understand how language models use their input context. To this end, we analyze model performance on multi-document question answering, which requires models to find relevant information within an input context and use it to answer the question. In particular, we make controlled changes to the length of the input context and the position of the relevant information and measure changes in task performance.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "2 Multi-Document Question Answering"
+  ],
+  "page_numbers": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "continuation_flag": "False",
+  "source_batch": 0,
+  "metadata": {
+    "position_in_batch": 10,
+    "raw_length": 466,
+    "heading_count": 2
+  }
+}

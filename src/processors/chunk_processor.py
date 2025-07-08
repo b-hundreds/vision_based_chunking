@@ -65,7 +65,15 @@ class ChunkProcessor:
         chunk_matches = self.chunk_pattern.finditer(raw_lmm_output)
         chunks = []
         
+        # Count to track chunk extraction for logging
+        match_count = 0
+        valid_chunk_count = 0
+        
+        # Track unique heading hierarchies in this batch for validation
+        batch_hierarchies = {}
+        
         for i, match in enumerate(chunk_matches):
+            match_count += 1
             chunk_content = match.group(1)
             
             # Extract components
@@ -75,13 +83,28 @@ class ChunkProcessor:
             
             if not heading_match or not content_match:
                 logger.warning(f"Chunk {i} in batch {batch_idx} is missing required components")
-                continue
-            
-            # Extract values
-            heading_hierarchy = [
-                h.strip() for h in heading_match.group(1).split('>')
-            ]
-            content = content_match.group(1).strip()
+                if not heading_match:
+                    logger.debug(f"Missing heading hierarchy in batch {batch_idx}, chunk {i}")
+                if not content_match:
+                    logger.debug(f"Missing content in batch {batch_idx}, chunk {i}")
+                
+                # Try to salvage chunks with missing components by assigning defaults
+                heading_hierarchy = ["Unknown Section"]
+                if heading_match:
+                    heading_hierarchy = [h.strip() for h in heading_match.group(1).split('>')]
+                    
+                content = "No content extracted"
+                if content_match:
+                    content = content_match.group(1).strip()
+                    
+                # Only continue if we have at least some content
+                if content == "No content extracted" or len(content.strip()) < 10:
+                    logger.warning(f"Skipping chunk with insufficient content in batch {batch_idx}")
+                    continue
+            else:
+                # Extract values
+                heading_hierarchy = [h.strip() for h in heading_match.group(1).split('>')]
+                content = content_match.group(1).strip()
             
             # Default continuation flag to "False" if not present
             continuation_flag = "False"
@@ -94,6 +117,12 @@ class ChunkProcessor:
                     )
                     continuation_flag = "False"
             
+            # Track hierarchies to detect potential mismatches
+            hierarchy_key = ">".join(heading_hierarchy)
+            if hierarchy_key not in batch_hierarchies:
+                batch_hierarchies[hierarchy_key] = []
+            batch_hierarchies[hierarchy_key].append(i)
+                
             # Create chunk
             chunk = Chunk(
                 id=f"b{batch_idx}_c{i}_{uuid.uuid4().hex[:8]}",
@@ -110,9 +139,70 @@ class ChunkProcessor:
             )
             
             chunks.append(chunk)
+            valid_chunk_count += 1
         
-        logger.info(f"Extracted {len(chunks)} chunks from batch {batch_idx}")
+        # Log warning if we detect many chunks with the same heading hierarchy
+        # This might indicate improper heading detection
+        if len(batch_hierarchies) == 1 and len(chunks) > 3:
+            hierarchy = list(batch_hierarchies.keys())[0]
+            logger.warning(
+                f"Batch {batch_idx} (pages {page_numbers}) has {len(chunks)} chunks "
+                f"all with the same heading hierarchy: {hierarchy}"
+            )
+        
+        # If no chunks were found but there was output from the LMM, try a fallback approach
+        if match_count == 0 and len(raw_lmm_output) > 100:
+            logger.warning(f"No chunk patterns found in batch {batch_idx}, trying fallback chunk extraction")
+            # Look for any content that might be useful - this is a very simple fallback
+            fallback_chunk = self._extract_fallback_chunk(raw_lmm_output, batch_idx, page_numbers)
+            if fallback_chunk:
+                chunks.append(fallback_chunk)
+                valid_chunk_count += 1
+        
+        logger.info(f"Extracted {len(chunks)} chunks from batch {batch_idx} (found {match_count} chunk patterns)")
         return chunks
+        
+    def _extract_fallback_chunk(self, raw_output: str, batch_idx: int, page_numbers: List[int]) -> Optional[Chunk]:
+        """
+        Extract a fallback chunk when normal pattern matching fails.
+        
+        Args:
+            raw_output: Raw LMM output
+            batch_idx: Batch index
+            page_numbers: List of page numbers
+            
+        Returns:
+            A Chunk object or None if no usable content found
+        """
+        # Remove any markdown formatting to get plain text
+        cleaned_text = re.sub(r'#+ ', '', raw_output)  # Remove headings
+        cleaned_text = re.sub(r'\*\*|\*|__|\||```', '', cleaned_text)  # Remove bold, italic, code blocks
+        
+        # Split into paragraphs
+        paragraphs = [p.strip() for p in cleaned_text.split('\n\n') if p.strip()]
+        
+        # Filter out short paragraphs and join the rest
+        content = '\n\n'.join([p for p in paragraphs if len(p) > 30])
+        
+        if len(content) < 100:
+            logger.warning(f"Fallback content too short in batch {batch_idx}: {len(content)} chars")
+            return None
+            
+        logger.info(f"Created fallback chunk with {len(content)} chars for batch {batch_idx}")
+        
+        # Create a fallback chunk
+        return Chunk(
+            id=f"fallback_b{batch_idx}_{uuid.uuid4().hex[:8]}",
+            content=content,
+            heading_hierarchy=["Fallback Content"],
+            page_numbers=page_numbers,
+            continuation_flag="False",
+            source_batch=batch_idx,
+            metadata={
+                "is_fallback": True,
+                "raw_length": len(content),
+            }
+        )
     
     def post_process_all(self, chunks: List["Chunk"]) -> List["Chunk"]:
         """
@@ -214,6 +304,53 @@ class ChunkProcessor:
         """
         valid_chunks = []
         
+        # First pass - check heading hierarchies against page numbers to detect potential issues
+        page_to_heading_map = {}
+        
+        # Build a mapping of page numbers to heading hierarchies
+        for chunk in chunks:
+            for page in chunk.page_numbers:
+                if page not in page_to_heading_map:
+                    page_to_heading_map[page] = []
+                page_to_heading_map[page].append(" > ".join(chunk.heading_hierarchy))
+        
+        # Build a mapping of headings to their page ranges
+        heading_to_pages = {}
+        for page, headings in page_to_heading_map.items():
+            for heading in headings:
+                if heading not in heading_to_pages:
+                    heading_to_pages[heading] = []
+                heading_to_pages[heading].append(page)
+        
+        # Check for heading assignments that span non-consecutive pages
+        suspicious_headings = {}
+        for heading, pages in heading_to_pages.items():
+            pages.sort()
+            page_ranges = []
+            current_range = [pages[0]]
+            
+            for i in range(1, len(pages)):
+                if pages[i] == pages[i-1] + 1:
+                    current_range.append(pages[i])
+                else:
+                    page_ranges.append(current_range)
+                    current_range = [pages[i]]
+            
+            if current_range:
+                page_ranges.append(current_range)
+            
+            if len(page_ranges) > 1:
+                range_strs = [f"{r[0]}-{r[-1]}" if len(r) > 1 else str(r[0]) for r in page_ranges]
+                suspicious_headings[heading] = range_strs
+        
+        # Log any suspicious heading assignments
+        if suspicious_headings:
+            for heading, ranges in suspicious_headings.items():
+                logger.warning(
+                    f"Suspicious heading assignment: '{heading}' appears on non-consecutive page ranges: {', '.join(ranges)}"
+                )
+        
+        # Second pass - clean up and validate each chunk
         for chunk in chunks:
             # Skip empty chunks
             if not chunk.content.strip():
@@ -225,6 +362,16 @@ class ChunkProcessor:
                 logger.warning(f"Chunk {chunk.id} has no heading hierarchy")
                 # Assign a default heading
                 chunk.heading_hierarchy = ["Unknown Section"]
+            
+            # Check if this chunk's heading is in the suspicious list
+            chunk_heading = " > ".join(chunk.heading_hierarchy)
+            if chunk_heading in suspicious_headings:
+                # Add a note to the metadata
+                if "validation_warnings" not in chunk.metadata:
+                    chunk.metadata["validation_warnings"] = []
+                chunk.metadata["validation_warnings"].append(
+                    f"This chunk's heading appears on non-consecutive page ranges: {', '.join(suspicious_headings[chunk_heading])}"
+                )
                 
             # Cleanup content (remove extra whitespace, etc.)
             chunk.content = self._cleanup_content(chunk.content)

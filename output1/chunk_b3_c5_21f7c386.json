@@ -1,0 +1,22 @@
+{
+  "id": "b3_c5_21f7c386",
+  "content": "D GPT-4 Performance We evaluate GPT-4 (8K) on a subset of 500 random multi-document QA examples with 20 total documents as in-context (Figure 15). GPT-4 achieves higher absolute performance than any other language model, but still shows a U-shaped performance curve\u2014its performance is highest when relevant information occurs at the very start or end of the context, and performance degrades when it must use information in the middle of its input context. Figure 15: Although GPT-4 has higher absolute performance than other models, its performance still degrades when relevant information occurs in the middle of the input context.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "Appendix",
+    "D GPT-4 Performance"
+  ],
+  "page_numbers": [
+    13,
+    14,
+    15,
+    16
+  ],
+  "continuation_flag": "False",
+  "source_batch": 3,
+  "metadata": {
+    "position_in_batch": 5,
+    "raw_length": 1117,
+    "heading_count": 3
+  }
+}

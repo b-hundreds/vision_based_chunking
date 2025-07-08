@@ -1,0 +1,25 @@
+{
+  "id": "b0_c8_f9ab5281",
+  "content": "Figure 2: Example of the multi-document question answering task, with an input context and the desired model answer. The document containing the answer is bolded within the input context here for clarity.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "2 Multi-Document Question Answering",
+    "2.1 Experimental Setup"
+  ],
+  "page_numbers": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "continuation_flag": "False",
+  "source_batch": 0,
+  "metadata": {
+    "position_in_batch": 8,
+    "raw_length": 653,
+    "heading_count": 3,
+    "validation_warnings": [
+      "This chunk's heading appears on non-consecutive page ranges: 1, 1-2, 2-3, 3-4, 4"
+    ]
+  }
+}

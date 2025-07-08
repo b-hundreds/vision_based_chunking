@@ -1,0 +1,22 @@
+{
+  "id": "b3_c2_511bb5c0",
+  "content": "A Ambiguity in Multi-Document QA Distractor Documents Following past work on NaturalQuestions-Open (Izacard et al., 2021; Izacard and Grave, 2021, inter alia), we use a Wikipedia dump from late 2018 as our retrieval corpus. However, this standard Wikipedia dump has a small amount of temporal mismatch with the NaturalQuestions annotations. For example, consider the question \u201cwhat nfl team does robert griffin iii play for\u201d. The NaturalQuestions annotated answer is \u201ccurrently a free agent\u201d. However, the Wikipedia retrieval corpus contains the information that he plays for the \u201cBaltimore Ravens\u201d, since he was released from the team between the Wikipedia dump\u2019s timestamp and the NaturalQuestions annotation process. We use the ambiguity annotations of Min et al. (2020) to create a subset unambiguous questions. Experiments on this unambiguous subset of the data show similar results and conclusions as the experiments on the full questions collection (Figure 12). Figure 12: Language model performance on a unambiguous subset of questions.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "Appendix",
+    "A Ambiguity in Multi-Document QA Distractor Documents"
+  ],
+  "page_numbers": [
+    13,
+    14,
+    15,
+    16
+  ],
+  "continuation_flag": "False",
+  "source_batch": 3,
+  "metadata": {
+    "position_in_batch": 2,
+    "raw_length": 1680,
+    "heading_count": 3
+  }
+}

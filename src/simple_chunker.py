@@ -5,6 +5,7 @@ without embedding or vector database storage.
 
 from typing import Dict, List, Optional, Tuple, Union, Any
 import os
+import uuid
 from pathlib import Path
 import logging
 from dataclasses import dataclass
@@ -116,6 +117,49 @@ class SimpleVisionChunker:
                 batch_idx=batch_idx,
                 page_numbers=[page.page_number for page in batch],
             )
+            
+            # If no chunks were extracted, try again with a different approach
+            retry_count = 0
+            while len(batch_chunks) == 0 and retry_count < 1:
+                logger.warning(f"No chunks extracted from batch {batch_idx}, retrying with simplified prompt")
+                retry_count += 1
+                
+                # Create a simplified context without previous context to avoid confusion
+                retry_context = self.context_manager.create_initial_context()
+                
+                # Try again with the LMM
+                raw_lmm_output = self.lmm_client.process_batch(
+                    batch_pages=batch,
+                    context=retry_context,
+                )
+                
+                # Try to extract chunks again
+                batch_chunks = self.chunk_processor.process(
+                    raw_lmm_output=raw_lmm_output,
+                    batch_idx=batch_idx,
+                    page_numbers=[page.page_number for page in batch],
+                )
+            
+            # Create a simple fallback chunk if still no chunks
+            if len(batch_chunks) == 0:
+                logger.warning(f"Still no chunks from batch {batch_idx} after retry, creating fallback chunk")
+                
+                # Create a simple fallback chunk with page numbers
+                page_nums = [page.page_number for page in batch]
+                fallback_content = f"Content from pages {', '.join(map(str, page_nums))}. " + \
+                                   "This is a fallback chunk created because no structured content could be extracted."
+                
+                fallback_chunk = Chunk(
+                    id=f"fallback_b{batch_idx}_{uuid.uuid4().hex[:8]}",
+                    content=fallback_content,
+                    heading_hierarchy=["Fallback Content"],
+                    page_numbers=page_nums,
+                    continuation_flag="False",
+                    source_batch=batch_idx,
+                    metadata={"is_fallback": True},
+                )
+                
+                batch_chunks = [fallback_chunk]
             
             # Update context for next batch
             previous_context = self.context_manager.update_context(

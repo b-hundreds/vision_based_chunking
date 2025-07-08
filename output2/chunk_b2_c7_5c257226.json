@@ -1,0 +1,21 @@
+{
+  "id": "b2_c7_5c257226",
+  "content": "Figure 11: Retriever recall and model performance as a function of the number of retrieved documents. Model performance saturates long before retriever recall, indicating that the models have difficulty making use of the extra retrieved documents. A line graph showing Metric on the y-axis (from 50 to 90) versus Number of Retrieved Docs on the x-axis (from 5 to 50). There are several lines representing different models: 'claude-1.3', 'claude-1.3-100k', 'gpt-3.5-turbo-0613', 'gpt-3.5-turbo-16k-0613', 'mpt-30b-instruct', 'longchat-13b-16k', and 'Contriever Recall'. The 'Contriever Recall' line steadily increases with the number of documents. All other model lines are relatively flat, showing a slight increase initially and then plateauing, indicating that their performance (Metric) does not improve much with more retrieved documents.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "5 Is More Context Is Always Better? A Case Study With Open-Domain QA"
+  ],
+  "page_numbers": [
+    9,
+    10,
+    11,
+    12
+  ],
+  "continuation_flag": "False",
+  "source_batch": 2,
+  "metadata": {
+    "position_in_batch": 7,
+    "raw_length": 843,
+    "heading_count": 2
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "b3_c3_9d7f3cc5",
+  "content": "B Random Distractors in Multi-Document QA We also run multi-document question answering experiments with random Wikipedia documents as distractors, which allows us to ablate the impact of retrieved distractors (hard negatives). Note that in this setting, the the document containing the answer can often be identified with simple heuristics (e.g., lexical overlap with the query). Figure 13 presents the results of this experiment. Although all models have higher absolute accuracy in this setting, they surprisingly still struggle to reason over their entire input context, indicating that their performance degradation is not solely due to an inability to identify relevant documents. Figure 13: Language model performance on multi-document QA when using random distractors, rather than retrieved distractors.",
+  "heading_hierarchy": [
+    "Lost in the Middle: How Language Models Use Long Contexts",
+    "Appendix",
+    "B Random Distractors in Multi-Document QA"
+  ],
+  "page_numbers": [
+    13,
+    14,
+    15,
+    16
+  ],
+  "continuation_flag": "False",
+  "source_batch": 3,
+  "metadata": {
+    "position_in_batch": 3,
+    "raw_length": 1365,
+    "heading_count": 3
+  }
+}
