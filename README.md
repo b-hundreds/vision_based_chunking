@@ -1,83 +1,89 @@
-# Vision-Based Chunking for RAG Systems
+# Vision-Guided Chunking
 
-This project implements an advanced document chunking algorithm for Retrieval-Augmented Generation (RAG) systems using Large Multimodal Models (LMMs). The algorithm processes PDF documents as images, allowing it to understand both the visual layout and textual content simultaneously.
+A system for intelligent document chunking using visual information from PDFs.
 
-## Key Features
+## Overview
 
-- **Multimodal Processing**: Uses LMMs to "see" the visual layout and "read" content at the same time
-- **Batch Processing**: Handles multi-page segments to preserve context across pages
-- **Context Preservation**: Maintains heading hierarchies and continuity between chunks
-- **Intelligent Chunking Rules**:
-  - Preserves structural elements (tables, lists, diagrams)
-  - Respects content flow and logical boundaries
-  - Generates continuation flags to indicate relationships between chunks
-- **Enhanced Metadata**: Each chunk includes structural context for better retrieval
+Vision-Guided Chunking overcomes limitations of traditional text-based chunking methods by "looking" at PDF documents, understanding their visual structure (layout, tables, images, columns), and then dividing them into meaningful, coherent chunks of information.
 
-## Architecture
+## Features
 
-The system follows these main processing steps:
+- **Visual Understanding**: Processes PDF documents as images, preserving layout information
+- **Intelligent Chunking**: Creates semantically meaningful chunks based on document structure
+- **Context Preservation**: Maintains context across page boundaries and between processing batches
+- **Hierarchical Headings**: Provides a 3-level heading structure for each chunk
+- **Multimodal Processing**: Uses Google Gemini to analyze both visual and textual information
 
-1. **Batch Creation**: Split document into batches of configurable page count
-2. **Context Management**: Preserve context between batches
-3. **LMM Processing**: Process pages visually using a multimodal model
-4. **Smart Chunking**: Create chunks following sophisticated rules
-5. **Post-processing**: Validate and merge related chunks
-6. **Embedding & Storage**: Convert chunks to vectors and store in a vector database
+## Installation
 
-## Setup and Usage
+1. Clone this repository:
+```bash
+git clone https://github.com/yourusername/vision_guided_chunking.git
+cd vision_guided_chunking
+```
 
-### Installation
-
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-### Configuration
-
-Create a `.env` file with your API keys:
-
+3. Create a `.env` file in the project root with your Google Gemini API key:
 ```
-GOOGLE_API_KEY=your_google_api_key_here
-OPENAI_API_KEY=your_openai_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-### Running the Chunker
+## Usage
 
-```python
-from vision_based_chunking import VisionChunker
+Process a PDF file:
 
-# Initialize the chunker
-chunker = VisionChunker(
-    batch_size=4,  # Number of pages per batch
-    lmm_model="gemini-2.5-pro",  # LMM model to use
-    embedding_model="text-embedding-3-small",  # Embedding model
-)
-
-# Process a document
-chunks = chunker.process_document("path/to/document.pdf")
-
-# Store chunks in vector database
-chunker.ingest_chunks(chunks, vector_db="elasticsearch")
+```bash
+python main.py -i input_pdfs/your_document.pdf -o output/your_document_chunks.json
 ```
+
+Or simply:
+
+```bash
+python main.py -i input_pdfs/your_document.pdf
+```
+
+This will automatically save the output to `output/your_document_chunks.json`.
+
+## System Architecture
+
+The system follows this workflow:
+
+1. **Input**: A PDF file
+2. **Preparation**: Convert PDF pages to images to preserve layout
+3. **Batching**: Group images into small batches (e.g., 4 pages per batch)
+4. **LLM Processing**: Send each batch to Google Gemini with a detailed prompt
+5. **Context Preservation**: Include context from previous batches
+6. **Post-processing**: Parse and merge chunks across batches
+7. **Output**: A JSON file with structured, meaningful chunks
 
 ## Project Structure
 
 ```
-vision_based_chunking/
-├── src/                   # Source code
-│   ├── __init__.py
-│   ├── chunker.py         # Main chunking logic
-│   ├── batch.py           # Batch processing
-│   ├── context.py         # Context management
-│   ├── lmm_client.py      # LMM API client
-│   ├── processors/        # Post-processing components
-│   ├── storage/           # Vector database integration
-│   └── utils/             # Utility functions
-├── data/                  # Sample data and test documents
-├── tests/                 # Test suite
-├── .env                   # Environment variables (not versioned)
-├── requirements.txt       # Project dependencies
-└── README.md              # Project documentation
+vision_guided_chunking/
+│
+├── input_pdfs/                 # Input PDF files
+│
+├── output/                     # Output JSON files
+│
+├── prompts/                    # LLM prompts
+│   └── multimodal_chunking_prompt.txt
+│
+├── src/                        # Source code
+│   ├── config.py               # Configuration settings
+│   ├── data_models.py          # Data structure definitions
+│   ├── pdf_processor.py        # PDF to image conversion
+│   ├── llm_handler.py          # Gemini API integration
+│   ├── chunk_parser.py         # Parse LLM responses
+│   ├── post_processor.py       # Process and merge chunks
+│   └── orchestrator.py         # Main processing workflow
+│
+├── main.py                     # Entry point
+├── requirements.txt            # Dependencies
+└── .env                        # Environment variables (API keys)
 ```
 
 ## License

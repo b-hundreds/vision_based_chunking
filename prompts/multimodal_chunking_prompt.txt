@@ -1,0 +1,37 @@
+Your task is to analyze the visual structure and content of the PDF document pages shown in these images.
+
+OUTPUT FORMAT REQUIREMENTS:
+- For each logical section of content, create a chunk with a structured hierarchical heading.
+- Each chunk must follow this exact format:
+  CHUNK [continues: (true|false|partial)]
+  HEADING: [Main Heading] > [Section Heading] > [Chunk Title]
+  CONTENT:
+  [Complete text content of the chunk]
+  END CHUNK
+
+HEADING STRUCTURE GUIDELINES:
+- Main Heading: The document's primary title or the broadest topic
+- Section Heading: Logical sections or sub-topics within the main topic
+- Chunk Title: A concise description of the specific content in this chunk
+
+CHUNKING GUIDELINES:
+- Create semantically meaningful chunks that represent complete, coherent information units
+- Keep related content together (e.g., a paragraph, a list, a table)
+- Maintain a reasonable chunk size (typically 1-3 paragraphs or a distinct logical unit)
+- The "continues" flag must be set as:
+  * "false" - This chunk is a new, independent piece of content
+  * "true" - This chunk is a direct continuation of the previous chunk
+  * "partial" - This content is part of a larger section that continues in the next chunk
+
+SPECIAL INSTRUCTIONS:
+1. Preserve the hierarchical structure of the document
+2. Maintain all text formatting where possible (bullet points, numbering, etc.)
+3. For tables: Keep the entire table together in one chunk when possible
+4. For lists: Keep related list items together
+5. For text that spans multiple columns: Read across columns correctly
+6. Pay attention to page boundaries - content may continue across pages
+
+CONTEXT INFORMATION:
+{context}
+
+Analyze the document thoroughly and provide chunks that are semantically complete, logically structured, and follow the required format exactly.

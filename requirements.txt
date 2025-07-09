@@ -1,22 +1,8 @@
-# Core dependencies
-python-dotenv>=1.0.0
-langchain>=0.1.0
-langchain-community>=0.0.10
-langchain-openai>=0.0.5
-google-generativeai>=0.4.0
-pydantic>=2.5.0
-numpy>=1.24.0
-pillow>=10.0.0
-pypdf>=4.0.0
-elasticsearch>=8.10.0
-tenacity>=8.2.3
-
-# Optional dependencies for visualization and evaluation
-matplotlib>=3.7.0
-pandas>=2.0.0
-
-# Development dependencies
-pytest>=7.4.0
-black>=23.7.0
-isort>=5.12.0
-mypy>=1.5.0
+pdf2image==1.16.3
+Pillow==10.0.0
+google-generativeai==0.3.1
+python-dotenv==1.0.0
+tqdm==4.66.1
+argparse==1.4.0
+numpy==1.24.3
+regex==2023.6.3
