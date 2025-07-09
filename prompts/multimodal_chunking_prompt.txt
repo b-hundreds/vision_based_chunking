@@ -9,6 +9,13 @@ OUTPUT FORMAT REQUIREMENTS:
   [Complete text content of the chunk]
   END CHUNK
 
+- For chunks containing figures, charts, or visualizations, structure the CONTENT section as:
+  [Original figure caption or title]
+  
+  [Detailed description and interpretation of the visualization]
+  
+  [Any additional text content related to the figure]
+
 HEADING STRUCTURE GUIDELINES:
 - Main Heading: The document's primary title or the broadest topic
 - Section Heading: Logical sections or sub-topics within the main topic
@@ -18,6 +25,8 @@ CHUNKING GUIDELINES:
 - Create semantically meaningful chunks that represent complete, coherent information units
 - Keep related content together (e.g., a paragraph, a list, a table)
 - Maintain a reasonable chunk size (typically 1-3 paragraphs or a distinct logical unit)
+- For figures/charts/graphs: Include both the visual element and your detailed interpretation
+- When a figure has a caption, include both the caption and your explanation of the figure
 - The "continues" flag must be set as:
   * "false" - This chunk is a new, independent piece of content
   * "true" - This chunk is a direct continuation of the previous chunk
@@ -31,7 +40,34 @@ SPECIAL INSTRUCTIONS:
 5. For text that spans multiple columns: Read across columns correctly
 6. Pay attention to page boundaries - content may continue across pages
 
+FIGURE & VISUALIZATION INSTRUCTIONS:
+1. For any figure, chart, graph, or visualization:
+   a. Include a detailed description of what the visualization shows
+   b. Explain key trends, patterns, or insights visible in the data
+   c. Describe axes, legends, data points, and their relationships
+   d. Connect the visualization to the surrounding context
+2. Don't just transcribe labels - interpret and explain what the visualization means
+3. For complex figures, include:
+   a. The overall purpose/conclusion of the visualization
+   b. Specific numerical insights when visible
+   c. Comparisons between different elements
+4. For diagrams or flowcharts:
+   a. Explain the overall structure and purpose
+   b. Describe key components and their relationships
+   c. Clarify the sequence or process being illustrated
+
 CONTEXT INFORMATION:
 {context}
 
 Analyze the document thoroughly and provide chunks that are semantically complete, logically structured, and follow the required format exactly.
+
+EXAMPLE OF FIGURE CHUNKING:
+Here's an example of how to chunk a figure or chart:
+
+CHUNK [continues: false]
+HEADING: Economic Report 2023 > Market Trends > Quarterly Revenue Growth Chart
+CONTENT:
+Figure 1: Quarterly Revenue Growth (2020-2023)
+
+This bar chart displays quarterly revenue growth percentages from Q1 2020 through Q4 2023. The visualization reveals a clear upward trend starting in Q3 2021, with the highest growth of 15.8% occurring in Q2 2023. The initial quarters (Q1-Q2 2020) show negative growth of approximately -5% to -8%, likely reflecting the economic impact of the pandemic. The turning point appears in Q4 2020 when growth returns to positive territory (2.1%). The subsequent quarters show steady improvement, with some seasonal fluctuations visible in Q4 of each year. The most recent quarter (Q4 2023) shows a slight decline to 12.3% from the previous quarter, potentially indicating a normalization of growth rates after the post-pandemic recovery period.
+END CHUNK
