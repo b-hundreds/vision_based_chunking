@@ -32,6 +32,18 @@ CHUNKING GUIDELINES:
   * "true" - This chunk is a direct continuation of the previous chunk
   * "partial" - This content is part of a larger section that continues in the next chunk
 
+CONTENT PRESERVATION REQUIREMENTS:
+- CRITICAL: Never mix content from different sections of the document
+- Strictly preserve the original flow and order of content
+- Do not combine unrelated paragraphs or text blocks into a single chunk
+- Maintain clear separation between main content and supporting elements
+
+FOOTNOTES AND ANNOTATIONS HANDLING:
+- Footnotes and references should be handled separately from main content
+- If a section contains footnotes, create a separate chunk for the footnotes with a heading that indicates they are footnotes
+- Do not mix footnotes with the main content they reference
+- Always distinguish between main text and supplementary annotations
+
 SPECIAL INSTRUCTIONS:
 1. Preserve the hierarchical structure of the document
 2. Maintain all text formatting where possible (bullet points, numbering, etc.)
@@ -70,4 +82,21 @@ CONTENT:
 Figure 1: Quarterly Revenue Growth (2020-2023)
 
 This bar chart displays quarterly revenue growth percentages from Q1 2020 through Q4 2023. The visualization reveals a clear upward trend starting in Q3 2021, with the highest growth of 15.8% occurring in Q2 2023. The initial quarters (Q1-Q2 2020) show negative growth of approximately -5% to -8%, likely reflecting the economic impact of the pandemic. The turning point appears in Q4 2020 when growth returns to positive territory (2.1%). The subsequent quarters show steady improvement, with some seasonal fluctuations visible in Q4 of each year. The most recent quarter (Q4 2023) shows a slight decline to 12.3% from the previous quarter, potentially indicating a normalization of growth rates after the post-pandemic recovery period.
+END CHUNK
+
+EXAMPLE OF FOOTNOTE HANDLING:
+Here's an example of how to handle footnotes:
+
+CHUNK [continues: false]
+HEADING: Economic Report 2023 > Market Analysis > Key Findings
+CONTENT:
+The analysis reveals three key findings about market performance in 2023. First, consumer spending increased by 4.2% year-over-year, exceeding analyst expectations. Second, the technology sector outperformed all other sectors with a 12.7% growth rate. Third, inflation concerns began to subside in Q3, leading to improved consumer sentiment scores.
+END CHUNK
+
+CHUNK [continues: false]
+HEADING: Economic Report 2023 > Market Analysis > Footnotes
+CONTENT:
+1. Consumer spending data sourced from National Economic Bureau, Annual Consumer Report 2023.
+2. Sector performance metrics based on S&P Global Industry Classification Standard.
+3. Consumer sentiment measured using the Michigan Consumer Sentiment Index, December 2023 release.
 END CHUNK

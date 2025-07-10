@@ -1,0 +1,239 @@
+{
+  "document_name": "test_paper.pdf",
+  "total_pages": 6,
+  "chunks": [
+    {
+      "id": "6f55e455-ccf9-428b-b5a7-79f6fead4977",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Title and Authors",
+      "content": "Do Large Language Models Need a Content Delivery Network?\n\nYihua Cheng, Kuntai Du, Jiayi Yao, Junchen Jiang\nThe University of Chicago",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Title and Authors",
+      "chunk_title": "Unknown Chunk",
+      "page_numbers": [
+        1
+      ]
+    },
+    {
+      "id": "db835fd5-5288-48e2-bede-3abeceab385c",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Abstract",
+      "content": "**Abstract**\n\nAs the use of large language models (LLMs) expands rapidly, so does the range of knowledge needed to supplement various LLM queries. Thus, enabling modular and efficient injection of new knowledge in LLM inference is critical. We argue that compared to the more popular fine-tuning and in-context learning, using KV caches as the medium of knowledge could simultaneously improve the modularity of knowledge injection and the efficiency of LLM serving with low cost and fast response. To make it practical, we envision a Knowledge-Delivery Network (KDN), a new component in LLM services that dynamically optimizes the storage, transfer, and composition of KV cache across LLM engines and other compute and storage resources. Just like content delivery networks (CDNs), such as Akamai, enabled the success of the Internet ecosystem through their efficient data delivery, KDNs will be critical to the success of LLM applications through their efficient knowledge delivery. An open-sourced KDN prototype: https://github.com/LMCache/LMCache.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Abstract",
+      "chunk_title": "Unknown Chunk",
+      "page_numbers": [
+        2
+      ]
+    },
+    {
+      "id": "62e81fd6-c655-4df1-ac67-f06cd9860d4e",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Background and Motivation > Introduction to Knowledge Injection",
+      "content": "**1 Background and Motivation**\n\nTraditionally, machine learning models, such as computer vision [22, 30, 31, 38] and image generation [20, 32, 37], learn all the knowledge from the training data. However, with the rapid usage growth of large language models (LLMs), applications require the ability to inject external knowledge, unseen in training, into LLM inference. For instance, chatbots [1, 5, 16] and agent systems use the chatting history as supplementary knowledge to generate personalized responses; enterprise-use LLMs query up answers to queries based on their internal databases, as new knowledge, using retrieval-augmented generation (RAG) [12, 25, 27, 36, 39]; and searching engines use LLMs to read fresh and relevant web data from the internet for each user query [2, 6, 10].\n\nNot only is providing more external knowledge among the most efficient ways to boost LLM quality [7, 28, 39, 41], but the requirements of knowledge injection also become more complex and diverse. For instance, in enterprise settings, data scientists and application operators often demand the flexibility that allows them to directly specify which documents (or which parts of a document) should or should not be used as the context to answer a given query [4, 9]. Moreover, as new data is being constantly collected [3, 8], the knowledge injection method must be efficient enough to keep up with the rapidly evolving pool of knowledge.\nThus, the key question is “how to design and implement a system to inject knowledge to LLMs?”\n\nThree knowledge-injection methods exist. In-context learning and fine-tuning are the two popular options employed by knowledge-augmented generation. Fine-tuning retrains an LLM on a new dataset using a set of labeled knowledge to update all or parts of the model’s parameters. Unlike fine-tuning, in-context learning leverages the existing capabilities of the model to interpret and respond to new information, without altering the model’s parameters. Yet, compared to using a fine-tuned model, in-context learning has much higher run-time computation overhead as it has to process a much longer input (i.e., the prefill step), before the model can generate the first token.\n\nAn alternative, which we refer to as KV-cache learning, is to let the LLM pre-compute the KV cache¹ of the new knowledge text so that when the same knowledge is needed to supplement another LLM query, the KV cache can be directly used by LLM. This way, LLMs can directly generate the response fast as the fine-tuned model, with little extra computation overhead to prefill the text of the knowledge as in-context learning. However, KV-cache learning, with a straightforward implementation, will suffer from the large size of the KV caches.\nMost research in the machine-learning communities has primarily focused on the generation quality of different knowledge-injection methods, in F1 score and accuracy [15, 29, 35]. Studies have shown that both in-context learning and fine-tuning can achieve high text-generation quality if they are configured appropriately by machine-learning engineers [11, 21, 42]. However, less is known about the tradeoffs of these methods presented to system engineers who implement and maintain the LLM infrastructure for knowledge-augmented LLM applications.\n\nThis paper sheds light on these methods from a system architecture’s perspective (Figure 1). Specifically, we make two key arguments.\n*   *Existing knowledge-injection methods–in-context learning, fine-tuning, and KV-cache learning–mainly differ in the tradeoffs between their* **modularity** (ease of adding new knowledge and flexibility to specify injected knowledge) and **efficiency** (in per-query cost and response delay). (§2)\n*   *Compared to in-context learning and fine-tuning, KV-cache learning* **could** *improve both modularity and efficiency.*",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Background and Motivation",
+      "chunk_title": "Introduction to Knowledge Injection",
+      "page_numbers": [
+        3,
+        4
+      ]
+    },
+    {
+      "id": "a7207e56-61a9-483b-9e22-ade906931c89",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Background and Motivation > Footnotes",
+      "content": "The 2nd Workshop on Hot Topics in System Infrastructure (HotInfra’24), co-located with SOSP’24, November 3, 2024, Austin, TX, USA\n\n¹KV cache is the intermediate state when LLM prefill on a text [33, 34, 40], which represents the LLM’s understanding of the knowledge. The architecture choice is the interface between the modules, and we leave the refinement of implementation to future work.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Background and Motivation",
+      "chunk_title": "Footnotes",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "f4bc7bbf-fddd-41f3-bdf9-837a267d20b0",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > System Perspective on Knowledge Injection > Comparison of Knowledge Injection Methods",
+      "content": "Figure 1. Knowledge-injection methods make trade-offs between modularity and efficiency. With Knowledge Delivery Networks (KDNs), KV-cache learning can improve on both dimensions compared to in-context learning and fine-tuning.\n\nThis is a table that compares \"In-context learning\" and \"Fine-tuning\" across two dimensions: \"Modularity\" and \"Efficiency\".\n- **In-context learning**:\n  - Modularity: Has a checkmark (✓), indicating it is good.\n  - Efficiency: Has a cross mark (✗), indicating it is poor.\n- **Fine-tuning**:\n  - Modularity: Has a cross mark (✗), indicating it is poor.\n  - Efficiency: Has a checkmark (✓), indicating it is good.\n- **KV-cache learning (with Knowledge Delivery Networks)**:\n  - Modularity: Has a checkmark (✓), indicating it is good.\n  - Efficiency: Has a checkmark (✓), indicating it is good.\n\nThe table visually summarizes the core argument of the paper: while existing methods trade off modularity for efficiency, the proposed KV-cache learning with KDNs aims to achieve both.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "System Perspective on Knowledge Injection",
+      "chunk_title": "Comparison of Knowledge Injection Methods",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "60a9b2f8-cca2-4844-b91e-d41134fb71de",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > System Perspective on Knowledge Injection > Introduction to Knowledge Delivery Networks (KDN)",
+      "content": "If a new system component, called **knowledge-delivery network (KDN)**, optimizes the management of KV caches by harnessing several emerging research efforts. (§3.2)\n\nAt a high level, a KDN serves as a backend of LLM-processed knowledge (i.e., KV caches), which can be a part of an LLM-serving system or shared across multiple LLM-serving systems. Unlike the existing LLM-serving systems [23, 26, 46], which deeply couple KV caches with LLM engines (i.e., sharing KV caches with GPUs and managing KV caches inside inferencing), KDNs call for a clean **separation** between KV-cache management and LLM serving engines, for better modularity and efficiency.\n\nWe will outline the key components of a KDN, including a storage pool of KV caches that leverages KV-cache compression, a fast KV-cache streaming system to transfer KV caches between LLM serving engines, and a KV-cache blender module that dynamically puts together multiple pieces of knowledge stored in modularized KV caches. Using a prototype of KDN, we will show that some emerging research efforts have already provided preliminary techniques, which together can make highly efficient KDNs a reality.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "System Perspective on Knowledge Injection",
+      "chunk_title": "Introduction to Knowledge Delivery Networks (KDN)",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "7027defb-21e2-4a5c-a044-35c08a986bd9",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > System Perspective on Knowledge Injection > Overview",
+      "content": "**2 LLM Knowledge-Injection From a System Perspective**\n\nKnowledge-augmented generation, particularly, fine-tuning and in-context learning, is well-studied in the literature. Fine-tuning embeds a corpus of texts in the LLM’s weights, so the fine-tuned model can directly respond to a user query with a low response delay. However, as the entire corpus of texts must be embedded in the model together, fine-tuning lacks the flexibility to add new knowledge and specify what knowledge should or should not be used.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "System Perspective on Knowledge Injection",
+      "chunk_title": "Overview",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "f12a430c-e4b3-4ca8-af3b-a79b1f239bac",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > System Perspective on Knowledge Injection > The Efficiency-Modularity Tradeoff",
+      "content": "**2.1 The efficiency-modularity tradeoff**\n\nIn-context learning is the opposite of fine-tuning, as it allows the operator to specify which external knowledge should be used easily by putting the texts in the LLM’s input. However, the compute overhead of prefilling will grow superlinearly with the input length, causing a long response delay when more external data is added to the input.\n\nBoth methods can achieve similar text-generation quality if used in the right way [11, 21, 42]. Instead of viewing these options only in terms of accuracy (i.e., through the ML perspective), we compare the knowledge-injection methods along the following two system-centric metrics: **modularity** and **efficiency**.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "System Perspective on Knowledge Injection",
+      "chunk_title": "The Efficiency-Modularity Tradeoff",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "ed236057-744c-4143-a36f-30a5dc9826e0",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > System Perspective on Knowledge Injection > Defining Modularity and Efficiency",
+      "content": "**Modularity:** In the context of knowledge-augmented LLM, the modularity of a method includes two aspects. First, a modular approach should allow service providers to specify which knowledge to use and compose them easily. Second, the overhead (e.g., time, cost) of injecting new knowledge into the LLM should be minimized.\nIn-context learning puts the new knowledge in the model’s input, rather than the model itself. The separation of knowledge and model serves as the key to modularity–LLM service providers can specify which knowledge to use and easily compose different pieces of knowledge, which helps the LLM to avoid conflicting knowledge and improve the generation quality. In contrast, fine-tuning has poor modularity. Users cannot specify which knowledge in the fine-tuned model would be used to generate the answer. Moreover, fine-tuning needs to happen for every new knowledge and model, which may take hours to days to complete.\n\n**Efficiency:** On the other hand, the efficiency of a knowledge-augmented LLM system is measured by per-query cost and response delay during LLM inference. Cost is the computation needed for the LLM to handle a request, and response delay is defined as the time between the LLM serving the request and the generation of the first token. Viewed through this lens, in-context learning is not ideal because when using in-context learning, LLMs must spend a long time prefilling input text with the knowledge before generating the first token. In contrast, fine-tuning is better in terms of efficiency. Because the knowledge is embedded in the model’s weights, the fine-tuned model can skip the long prefill.\n\nIn short, in-context learning is more modular but sacrifices efficiency, while fine-tuning, though achieving better efficiency, suffers from the overhead of incorporating and controlling the knowledge due to poor modularity.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "System Perspective on Knowledge Injection",
+      "chunk_title": "Defining Modularity and Efficiency",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "d4aa8fd1-31b2-4757-842d-7c65c3ed78fb",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > System Perspective on Knowledge Injection > KV-Cache Learning",
+      "content": "**2.2 KV-Cache Learning**\n\nAlternatively, KV-cache learning stores the knowledge in a pre-generated KV cache, and injects knowledge by feeding the KV cache to the LLM, without modifying the model. A KV cache stores the knowledge in the form of the attention state generated by the model after it processes the text, so the KV cache, once generated, can be reused by the LLM to skip prefilling if the subsequent requests use the same context. When many queries reuse the same context, reusing its KV cache could reduce the per-query delay and compute usage, while still preserving the modularity as in-context learning. The idea of KV-cache learning has gained increasing attention in LLM services (e.g., [7, 36, 44]).\n\n**Why does KV-cache learning pay off?** On the surface, the use of KV caches may seem merely a space-time tradeoff (trading KV cache storage space for shorter prefill), but the tradeoff is favorable for two reasons:",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "System Perspective on Knowledge Injection",
+      "chunk_title": "KV-Cache Learning",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "5acef64c-3f45-4ee3-80b4-5573fb1d02b2",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Knowledge Delivery Networks for Efficient Knowledge Injection > Architecture of a Knowledge Delivery Network (KDN)",
+      "content": "Figure 2. Architecture of a Knowledge Delivery Network (KDN)\n\nThis figure consists of three diagrams illustrating different methods of knowledge injection for LLMs.\n\n**(a) Injecting knowledge via in-context learning (feeding text or raw data to LLMs)**\nThis diagram shows various data sources (Chat history, Books, News, Docs, Video) being fed directly into \"LLM serving engines\". This represents the standard in-context learning approach where raw data is part of the prompt.\n\n**(b) Injecting knowledge via Knowledge-Delivery Networks (feeding KV caches to LLMs)**\nThis diagram shows the same data sources first being processed by a \"Knowledge Delivery Network (KDN)\". The KDN then feeds processed KV caches to the \"LLM serving engines\". This illustrates the proposed architecture where knowledge is pre-processed into a more efficient format (KV caches).\n\n**(c) High-level structure of the proposed Knowledge Delivery Network (KDN)**\nThis is a flowchart detailing the components of the KDN.\n- It starts with a \"KV Cache Store\" which provides \"Better long-context quality via opportunistic attention steering\".\n- The store feeds into a \"KV Cache Delivery\" module, responsible for \"Fast KV cache delivery via encoding & streaming\".\n- The delivery module feeds into a \"KV Cache Blend\" module, which performs \"KV cache composition via selective recomposition\".\nThe output of the KDN is the final, blended KV cache ready for the LLM engine. This diagram highlights the three main functional modules of the KDN: storage, delivery, and blending.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Knowledge Delivery Networks for Efficient Knowledge Injection",
+      "chunk_title": "Architecture of a Knowledge Delivery Network (KDN)",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "f4176b33-f0d6-46c9-a6d5-4d51a49512a8",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Knowledge Delivery Networks for Efficient Knowledge Injection > Properties of KV Caches",
+      "content": "*   *KV caches are reused a lot.* Many contexts, especially long contexts, are frequently reused for different queries and different users. This can be viewed as the LLM version of the Pareto’s rule: an LLM, like human, uses 20% of the knowledge for 80% of the time, which means knowledge is frequently reused. Just consider that if a user asks the LLM to read a book, it is unlikely that they will only ask one book-related question.\n*   *The size of KV caches increases slower than prefill delay.* As the context increases, the KV cache size grows linearly, whereas the prefill delay grows superlinearly. And, as the LLM gets bigger, more compute will happen at the feedforward layers which do not affect the KV cache size.\n\nmight degrade, lowering the inference quality. Thus, when the KV caches are reused by more queries repeatedly, the degraded quality will also affect more queries.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Knowledge Delivery Networks for Efficient Knowledge Injection",
+      "chunk_title": "Properties of KV Caches",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "cbd7168c-6b2a-469e-8eb9-17ab7593dc6a",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Knowledge Delivery Networks for Efficient Knowledge Injection > Limitations of Existing Systems",
+      "content": "**3 Knowledge Delivery Networks for Efficient Knowledge Injection**\n\n**Limitations of Existing KV-Cache Systems:** Despite the promise, existing KV-caching learning systems still have some technical limitations.\n*   *Limited storage for KV caches:* Currently, many serving engines only use the fast CPU/GPU memory, locally accessible by an individual LLM instance, to store KV caches. Such local-memory-only storage greatly limits the amount of KV caches that are stored and reused. For instance, a CPU memory of 64 GB can only store the KV cache of 160k tokens (two pdf reports) for a small-size LLM (Llama-34B). However, expanding the storage of KV caches to disk or remote servers would significantly constrain the bandwidth for loading the KV caches into GPU memory.\n*   *Prefix-only caches:* To reuse the KV caches, most systems require that the text of the KV cache must be the prefix of the LLM input. Even though reusing the KV cache of the prefix is naturally supported by LLMs, this assumption of “sharing prefix only” severely limits its use cases. For instance, retrieval-augmented generation (RAG) concatenates multiple retrieved text chunks in the LLM input, so most retrieved text will not be the prefix.\n*   *Degraded quality with long contexts:* Finally, as more texts are added to the input as LLM’s context (i.e., long context), the LLM’s capability to capture important information",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Knowledge Delivery Networks for Efficient Knowledge Injection",
+      "chunk_title": "Limitations of Existing Systems",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "61c56275-35df-4f1e-b843-ec2bfb6f7d23",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Knowledge Delivery Networks for Efficient Knowledge Injection > KDN Architecture",
+      "content": "**3.1 Knowledge delivery architecture**\n\nAt first glance, these challenges facing prior KV-cache-based systems may look disparate. Yet, our insight is that they share a common need—*a separate KV-cache management system, which dynamically compresses, composes, and modifies KV caches to optimize the storage and delivery of KV caches and the LLM inference based on KV caches.* We refer to such a system as a **Knowledge Delivery Network (KDN)**. As depicted in Figure 2, the envisioned architecture of a KDN consists of three main modules:\n*   The **storage** module stores the KV caches keyed by various texts and offline modifies the KV cache content such that the inference quality will be improved when the KV caches are fed to the LLM.\n*   The **delivery** module transmits the compressed KV caches from the storage device to the server running the LLM and decompresses them in GPU to be used by the LLM serving engine.\n*   The **blending** module dynamically composes multiple KV caches corresponding to different texts when these texts are put together in the context of an LLM query.\n\nThe existing LLM serving systems (e.g., [23, 46]) deeply couple KV caches with LLM engines. In contrast, the concept of KDN is to **separate** the management of KV caches and the LLM serving engines. Such separation will enable innovations on the storage, sharing, and use of KV caches, without needing to be deeply coupled with the LLM serving engines. By implementing these optimizations separately, a KDN serves as a critical sub-system module for LLM-serving ecosystems. It enables the decoupling of KV-cache management from LLM serving engines, which allows LLM serving engines to focus on fast query-driven inference, while the KDN can focus on the KV-cache-related optimizations independently.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Knowledge Delivery Networks for Efficient Knowledge Injection",
+      "chunk_title": "KDN Architecture",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "3de626f8-e2a3-44f8-881d-9c5ba191debf",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Knowledge Delivery Networks for Efficient Knowledge Injection > Technical Roadmap",
+      "content": "**3.2 Technical Roadmap**\n\nThe architecture of KDN itself does not directly address the challenges associated with KV caches; it merely breaks a",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Knowledge Delivery Networks for Efficient Knowledge Injection",
+      "chunk_title": "Technical Roadmap",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "f70c255d-2c6f-41f8-833e-bed6bd5d5dee",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Technical Roadmap and Conclusion > Comparison of Knowledge-Injection Methods",
+      "content": "Table 1. Comparison between different knowledge-injection methods under a RAG setup. With KDN, KV-cache learning is 40× faster when incorporating new knowledge than fine-tuning, and achieves 3.7× faster and 2.5× cheaper during inference compared to in-context learning.\n\nThis table compares three knowledge injection methods across two main categories: Modularity and Efficiency.\n\n| | **Modularity** | **Efficiency** |\n| :--- | :--- | :--- |\n| | **Time to inject new knowledge** | **Inference cost ($) per request** | **Response delay (s) per request** |\n| **Fine-tuning** | 10 hours | 0.0022 | 0.81 |\n| **In-context learning** | - | 0.0149 | 10.91 |\n| **KV-cache learning w/ KDN** | 0.25 hours | 0.0059 | 2.97 |\n\n**Interpretation:**\n- **Modularity (Time to inject new knowledge):** KV-cache learning with KDN is significantly faster (0.25 hours) at incorporating new knowledge compared to fine-tuning (10 hours). In-context learning has no explicit injection time as knowledge is provided at inference.\n- **Efficiency (Inference cost & Response delay):**\n  - **Cost:** KV-cache learning with KDN ($0.0059) is about 2.5 times cheaper than in-context learning ($0.0149) but more expensive than fine-tuning ($0.0022).\n  - **Delay:** KV-cache learning with KDN (2.97s) is about 3.7 times faster than in-context learning (10.91s) but slower than fine-tuning (0.81s).\n\nThe table demonstrates that KV-cache learning with KDN offers a strong middle ground, providing much better modularity than fine-tuning and much better efficiency than in-context learning.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Technical Roadmap and Conclusion",
+      "chunk_title": "Comparison of Knowledge-Injection Methods",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "637fa253-d2bb-4ed4-a694-916be3c3081b",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Technical Roadmap and Conclusion > KDN Technical Solutions",
+      "content": "potential solution into three modules. Fortunately, we observe that emerging research efforts could lead to a sufficient design for each module, thus making KDN practical.\n\n**KV-cache delivery:** The recent KV cache compression techniques make it possible to cheaply store and quickly load KV caches outside GPU and CPU memory. For instance, S-LoRA [33] compresses the KV cache by quantizing and then encoding it into binary strings. LLMLingua [24] introduces a smaller language model to identify and remove non-essential tokens in the knowledge’s text, thus reducing the size of the corresponding KV cache. H2O [45] directly removes elements in the KV cache based on their importance calculated during the inference. By combining the above techniques, the memory footprint of the KV cache can be reduced by over 10×, drastically improving the loading speed and the storage cost of the KV cache.\n\n**KV-cache blending:** One recent works also improves the composability of the KV caches. CacheBlend [43], for instance, enables arbitrarily composing different KV caches by recomputing the cross-attention between KV caches, where the recomputation only incurs 10% computation of prefilling the full text. PromptCache [19] lets users define a prompt template with different segments, which allows each segment’s KV cache to be reused at different positions rather than prefix-only.\n\n**Offline KV-cache editing:** By separating KV-cache management from the LLM-serving engines, KDNs open up new possibilities to improve inference quality. Recent works have shown that if the attention matrix of an LLM input is appropriately modified, the inference quality can significantly improve [13, 42]. In other words, when a KV cache is “de-posited” to KDN, KDN not only stores it but also can actively influence the LLM inference quality by offline editing the KV cache and returning the edited KV cache when it is retrieved next time, all of which is done without any change to the model itself or the input prompt.\n\n**Interfacing with LLM serving engines:** Currently, most LLM serving engines, such as vLLM [23], Huggingface TGI [23], and SGLang [46], do not readily support the injection of external provided KV caches as a part of the LLM input. Instead, their internal implementation for KV-cache management (i.e., paged memory in vLLM) is deeply cobbled with the model inference implementation. One way to deploy KDN is to augment each LLM engine with a KDN as submodule of the",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Technical Roadmap and Conclusion",
+      "chunk_title": "KDN Technical Solutions",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "68ea7238-46f1-4b3c-95da-661ef72bb4e0",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Technical Roadmap and Conclusion > KDN Implementation and Promise",
+      "content": "LLM engine. However, as elaborated in §3.1, developing a performant KDN is a substantial undertaking, so it will spare much redundant engineering effort if each LLM engine maintains and evolves its KDNs. To avoid reinventing the wheel, the LLM serving engines could interface with a separate, shared KDN provider via two APIs: (i) the LLM stores the KV cache with the associated text to KDN, and (ii) the LLM retrieves the KV cache from KDN using some text. Exposing these APIs is feasible, given most popular LLM engines are open-source. Still, several design questions remains: how to leverage heterogeneous links, such as NVLink, RDMA, or PCIe, to transfer KV caches? Can the APIs be shared with other LLM functions, like disaggregated prefilling?\n\n**Early promise:** Based on these techniques, we implemented LMCache (https://github.com/LMCache/LMCache), a prototype of KDNs. We compare the modularity and efficiency of KV-cache learning with KDN to fine-tuning and in-context learning, under a RAG use case with the following setup:\n*   Total size of knowledge (in text): 2 million tokens.\n*   Each request: 8k tokens knowledge plus 2k tokens user chatting history.\n*   Language model: Llama 3-L-70B [18].\n*   Hardware: 2 Nvidia A40 GPUs.\nModularity is measured by the time² of injecting the knowledge base into LLM, and efficiency is measured by inference cost³ and response delay per request. Table 1 shows that with our KDN, KV-cache learning can be 40× faster than fine-tuning when injecting new knowledge, and it also achieves 3.7× cheaper and 2.5× faster during inference time compared to in-context learning.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Technical Roadmap and Conclusion",
+      "chunk_title": "KDN Implementation and Promise",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "2aeea7b1-5cd5-4c7c-836f-f6775fd663e0",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Technical Roadmap and Conclusion > Conclusion",
+      "content": "**4 Conclusion**\n\nIn short, this paper makes a case for (1) the separation between the management of knowledge in the form of KV caches, and LLM serving engines, and (2) a Knowledge-Delivery Network (KDN) as a new LLM system component that integrates recent research developments to optimize the efficiency (in speed and cost) of KV-cache-based knowledge injection. We hope this paper can inspire more research to tackle the aforementioned problems.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Technical Roadmap and Conclusion",
+      "chunk_title": "Conclusion",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "7d978666-ec08-4617-80cd-36d6c8bc615e",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > Technical Roadmap and Conclusion > Footnotes",
+      "content": "²We assume the chatting history cannot be pre-learned by fine-tuning.\n³The time for fine-tuning the model is estimated from Llama-Adapter [15].\n⁴The inference cost is calculated based on the AWS cloud price [12].",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "Technical Roadmap and Conclusion",
+      "chunk_title": "Footnotes",
+      "page_numbers": [
+        4
+      ]
+    },
+    {
+      "id": "4f92f005-7937-44d6-8425-a072ae209194",
+      "heading": "Do Large Language Models Need a Content Delivery Network? > References > Citations (1-36)",
+      "content": "References\n\n[1] character.ai personalized for every moment of your day. https://character.ai/. (Accessed on 09/07/2024).\n[2] Enterprise search: an llm-enabled out-of-the-box search engine. https://io.google/2023/program/27ce05f-df4c-4ab2-9a59-5b46b6daef0f/. (Accessed on 09/07/2024).\n[3] How many websites are there in the world? (2024) – siteefy. https://siteefy.com/how-many-websites-are-there/. (Accessed on 09/08/2024).\n[4] Instruction to exclude certain information when generating answer - opensearch developer portal. https://opensearch.org/docs/latest/ml-commons-plugin/exclude-certain-information-when-generating-answer/#470451. (Accessed on 09/08/2024).\n[5] Introducing the chat api. https://openai.com/index/chatgpt/. (Accessed on 09/07/2024).\n[6] Perplexity. https://www.perplexity.ai/. (Accessed on 09/07/2024).\n[7] Perplexity. https://docs.the-guild.io/2024-09-17-release/. (Accessed on 09/14/2024).\n[8] Perplexity partners with elevenlabs to launch ‘discover daily’ podcast. https://www.perplexity.ai/hub/blog/perplexity-partners-with-elevenlabs-to-launch-discover-daily-podcast. (Accessed on 09/08/2024).\n[9] Revolutionizing operational efficiency: Unifying analytics and observability for seamless decision-making. https://www.civo.com/blog/revolutionizing-operational-efficiency-unifying-analytics-and-observability-for-seamless-decision-making. (Accessed on 09/07/2024).\n[10] Search - consensus is a search engine for research. https://consensus.app/search/. (Accessed on 09/07/2024).\n[11] Simone Alghisi, Massimo Rizzoli, Gabriele Svelto, and Seyed Mahdi Bateni. Should We Fine-tune or RAG? Evaluating Different Techniques to Adapt LLMs for Dialogue. arXiv preprint arXiv:2404.09561, 2024.\n[12] Amazon Web Services. Ec2 on-demand instance pricing – amazon web services, 2024. (Accessed on September 02, 2024).\n[13] Anonymous. Model full where need to attend: Faithfulness meets automatic attention steering. In Submitted to ACL Rolling Review - June 2024. ACL, Under review.\n[14] Bowen Chen, Hongyu Lin, Xianpei Han, and Le Sun. Benchmarking large language models in retrieval augmented generation. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 17754–17762, 2023.\n[15] Yixuan Chen, Ruixiang Zhang, Sheng Zhe, George Karypis, and He He. Meta-learning via language model in-context tuning. arXiv preprint arXiv:2110.07814, 2021.\n[16] Wenxuan Ding, Linyong Zheng, Ying Sheng, Anastasios Nikolas Angelopoulos, Tianle Li, Dacheng Li, Hao Zhang, Banghua Zhu, Michael Jordan, and Jian Li. Longlora: Efficient fine-tuning of long-context large language models. arXiv preprint arXiv:2309.12307, 2023.\n[17] Wenxuan Dong, Lei Li, Damai Dai, Ce Zheng, Zhiyong Wu, Baobao Chang, Xu Sun, Jingjing Xu, and Zhifang Sui. A survey on in-context learning. arXiv preprint arXiv:2301.00234, 2023.\n[18] Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad Al-Dahle, Aiesha Ahmed, Akhil Mathur, Alok Kamlesh Soni, et al. Llama-adapter v2: The efficiency of ai models. arXiv preprint arXiv:2407.1783, 2024.\n[19] In Faeze, Qinsin Chen, Seung-seob Lee, Nikhil Sarda, Anurag Khan, Delwal, and Lin Zhang. Prompt cache: Modular attention reuse for low-latency inference, 2023.\n[20] Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. Generative adversarial networks. Communications of the ACM, 63(11):139–144, 2020.\n[21] Anirudha Gupte, Anup Shirgaonkar, Anant de Luis Balaguer, Bruno Silva, Aniket Relekar, Lucas C. de Almeida, Rafael Ferreira de O. Nunes, Mahsa Rouzbahman, Morris Sharp, et al. RAG vs Fine-tuning: Pipelines, Tradeoffs, and a Case Study on Agriculture. arXiv preprint arXiv:2401.08406, 2024.\n[22] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 770–778, 2016.\n[23] Huggingface. text-generation-inference, 2024.\n[24] Huayang Li, Junwei Deng, Qihang Wu, Yixiao Su, Yiran Wang, and Lidi Qiu. Lmlingua: Compressing prompts for accelerated inference of large language models. arXiv preprint arXiv:2310.05736, 2023.\n[25] Zhenghao Liu, Faeze P. Arani, Qun Liu, Zhaoyun Sun, Qiao Jin, Jian-Guang Lou, Yujia Pang, Jaman Callan, and Graham Neubig. Active retrieval augmented generation. arXiv preprint arXiv:2305.06983, 2023.\n[26] Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, et al. Retrieval-augmented generation for knowledge-intensive nlp tasks. Advances in neural information processing systems, 33:9459–9474, 2020.\n[27] Patrick Lewis, Badr AlKhamissi, and Yuxuan Liu. Enhancing llm factual accuracy with rag to counter hallucinations: A case study on domain-specific queries in private knowledge bases. arXiv preprint arXiv:2401.10446, 2024.\n[28] Haokun Liu, Derek Tam, Mohammed Muqeeth, Jay Mohta, Tenghao Huang, Mohit Bansal, and Colin A Raffel. Why is in-context learning better than fine-tuning? In Advances in Neural Information Processing Systems, 35:1950–1965, 2022.\n[29] Haokun Liu, Derek Tam, Mohammed Muqeeth, Jay Mohta, Tenghao Huang, Mohit Bansal, and Colin A Raffel. Visual in-context tuning. Advances in neural information processing systems, 35:1950–1965, 2022.\n[30] Wei Liu, Dragomir Anguelov, Dumitru Erhan, Christian Szegedy, Scott Reed, Cheng-Yang Fu, and Alexander C. Berg. Ssd: Single shot multibox detector. In Computer Vision–ECCV 2016: 14th European Conference, Amsterdam, The Netherlands, October 11–14, 2016, Proceedings, Part I 14, pages 21–37. Springer, 2016.\n[31] Zein Liu, Kai Zhang, Yuan Li, Zhiling Yan, Chujie Gao, Ruoxi Chen, Zhengxuan Yuan, Bo Huang, Hanchi Sun, Jianfeng Gao, et al. Sora: A review on background, technology, limitations, and opportunities of large vision models. arXiv preprint arXiv:2402.17177, 2024.\n[32] Yuhuai Wu, Shucheng Li, Jianing Du, Jiaqi Guo, Dian Luan, Yuyang Shang, Shan Liu, Michael Maire, and Fei-Fei Hoffman. Ai Holtzman, et al. Cachegen: Fast context loading for language model applications. arXiv preprint arXiv:2403.04624, 2024.\n[33] Zichang Liu, Aditya Desai, Fangshuo Liao, Weitao Wang, Victor Xie, Jianzong Wu, Xiaodong Liu, and Weizhu Chen. Hypercache: Rethinking the persistence of importance hypotheses for llm kv cache compression at test time. Advances in Neural Information Processing Systems, 36, 2023.\n[34] Marius Mosbach, Tiago Pimentel, Shauli Ravfogel, Dietrich Klakow, and Yanai Elazar. Few-shot fine-tuning vs. in-context learning: A fair comparison and evaluation. arXiv preprint arXiv:2305.16938, 2023.\n[35] Ruoyu Qin, Zheming Li, Weiran He, Mingxing Zhang, Yongwei Wu, Weimin Zheng, and Meixu Xu. Me-cache: Boost kvcache-centric.\n[36] Ruoyu Qin, Zheming Li, Weiran He, Mingxing Zhang, Yongwei Wu, Weimin Zheng, and Meixu Xu. Me-cache: Boost kvcache-centric\narchitecture for llm serving. arXiv preprint arXiv:2407.00079, 2024.\n[37] Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages 10684–10695, 2022.\n[38] Shaoqing Ren, Kaiming He, Ross Girshick, and Jian Sun. Faster r-cnn: Towards real-time object detection with region proposal networks. In Advances in neural information processing systems, 28, 2015.\n[39] Chien-Yao Wang, Alexey Bochkovskiy, and Hong-Yuan Mark Liao. Yolov7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages 7464–7473, 2023.\n[40] Jinyi Wu, Zicheng Zhang, Linyan Li, Shidong Cao, Yibin Zheng, Zhaofeng He, Kunta Pu, Shan Liu, and Junchen Jiang. Cachekv: Fast large language model serving with cached knowledge fusion. arXiv preprint arXiv:2405.13661, 2024.\n[41] Zhenrui Yue, Honglei Zhuang, Ajihan Bai, Kai Hui, Rolf Jagerman, Haisu Cong, Zhen Qian, Yuyang Wang, Xuanhui Wang, and Michael Bendersky. Efficient scaling for large language model augmented generation. arXiv preprint arXiv:2410.04343, 2024.\n[42] Qingru Zhang, Chandan Singh, Liyuan Liu, Xiaodong Liu, Bin Yu, Jianfeng Gao, and Tuo Zhao. Tell your model where to attend: Post-hoc attention steering for llms. arXiv preprint arXiv:2310.08287, 2023.\n[43] Zhenrui Zhang, Zhening Li, Linyan Li, Shidong Cao, Yibin Zheng, Zhaofeng He, Kunta Pu, Shan Liu, and Junchen Jiang. Cachekv: Fast large language model serving with cached knowledge fusion. arXiv preprint arXiv:2405.13661, 2024.\n[44] Tianjun Zhang, Shishir G Patil, Naman Jain, Sheng Shen, Matei Zaharia, Ion Stoica, and Joseph E Gonzalez. Loft: Adapting language model to domain specific rag. arXiv preprint arXiv:2403.10731, 2024.\n[45] Yichun Zhang, Zhaozhuo Xu, Ruixiang Zhang, Jianing Du, Jiaqi Guo, Dian Luan, Yuyang Shang, Shan Liu, Michael Maire, and Fei-Fei Hoffman. Ai Holtzman, et al. H2o: Heavy-hitter oracle for efficient generative inference of large language models. In Workshop on Efficient Systems for Foundation Models (MLSys’2023), 2023.\n[46] Linyuan Zhang, Guanzhong Chen, Yin Zheng, Chengruidong Zhang, Jeff Huang, Chuyang Sun, Cody Hao Yu, Shiyi Cao, Christos Kozyrakis, Ion Stoica, Joseph E Gonzalez, et al. Efficiently programming large language models using sglang. arXiv preprint arXiv:2312.07104, 2023.",
+      "main_heading": "Do Large Language Models Need a Content Delivery Network?",
+      "section_heading": "References",
+      "chunk_title": "Citations (1-36)",
+      "page_numbers": [
+        5,
+        6
+      ]
+    }
+  ]
+}

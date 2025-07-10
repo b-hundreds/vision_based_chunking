@@ -1,5 +1,6 @@
 import logging
 import uuid
+import re
 from typing import List, Dict, Tuple
 
 from src.data_models import RawChunk, FinalChunk
@@ -15,7 +16,14 @@ class PostProcessor:
     
     def __init__(self):
         """Initialize the post processor."""
-        pass
+        # Pattern to identify footnote sections
+        self.footnote_pattern = re.compile(r'^\d+\.\s', re.MULTILINE)
+        self.is_footnote_section = lambda content: bool(self.footnote_pattern.search(content))
+        
+        # Track heading context across batches and pages
+        self.last_main_heading = None
+        self.last_section_heading = None
+        self.last_chunk_title = None
     
     def process_chunks(self, raw_chunks: List[RawChunk], page_numbers: List[int]) -> List[FinalChunk]:
         """
@@ -48,9 +56,35 @@ class PostProcessor:
                 section_heading = heading_parts[1]
                 chunk_title = heading_parts[2]
             
+            # Check if this is a footnote section
+            is_footnote = self.is_footnote_section(chunk.content)
+            
+            # For footnotes, we always create a new chunk with appropriate heading
+            if is_footnote and not chunk_title.lower().startswith("footnote"):
+                chunk_title = "Footnotes" if chunk_title else "Footnotes"
+            
+            # Apply heading continuity logic for chunks that span across pages
+            if chunk.continues and self.last_section_heading is not None and not is_footnote:
+                # When a chunk continues from a previous batch/page, preserve the section heading context
+                if i == 0:  # First chunk in the batch
+                    # Use the last section heading from the previous batch to ensure continuity
+                    section_heading = self.last_section_heading
+            
+            # For figures or content that might be split across pages:
+            # Check for visual content markers (like "Figure", "Table", etc.) in the chunk title or content
+            content_lower = chunk.content.lower()
+            title_lower = chunk_title.lower()
+            is_visual_content = any(marker in content_lower[:100] or marker in title_lower 
+                                   for marker in ["figure", "fig.", "table", "chart", "graph", "diagram", "illustration"])
+                                   
+            # If this is a continuation but doesn't have a clear section heading, use the previous one
+            if (chunk.continues or is_visual_content) and i > 0 and main_heading == self.last_main_heading:
+                # Keep the section heading consistent with the previous chunk
+                section_heading = self.last_section_heading
+            
             # Handle continuation chunks
-            if chunk.continues and last_chunk is not None:
-                # Merge this chunk with the last one
+            if chunk.continues and last_chunk is not None and not is_footnote:
+                # Merge this chunk with the last one only if it's not a footnote
                 last_chunk.content += f"\n{chunk.content}"
                 
                 # Add page numbers
@@ -64,7 +98,7 @@ class PostProcessor:
                 # Create a new final chunk
                 new_chunk = FinalChunk(
                     id=str(uuid.uuid4()),
-                    heading=chunk.heading,
+                    heading=f"{main_heading} > {section_heading} > {chunk_title}",  # Regenerate heading with possibly modified section_heading
                     content=chunk.content,
                     main_heading=main_heading,
                     section_heading=section_heading,
@@ -74,6 +108,11 @@ class PostProcessor:
                 final_chunks.append(new_chunk)
                 last_chunk = new_chunk
                 logger.debug(f"Created new chunk: {new_chunk.id}")
+            
+            # Update the heading context
+            self.last_main_heading = main_heading
+            self.last_section_heading = section_heading
+            self.last_chunk_title = chunk_title
         
         logger.info(f"Post-processing complete. Produced {len(final_chunks)} final chunks.")
         return final_chunks
@@ -91,13 +130,25 @@ class PostProcessor:
         if not final_chunks:
             return ""
         
-        last_chunk = final_chunks[-1]
+        # Find the last non-footnote chunk to use as context
+        last_main_chunk = None
+        for chunk in reversed(final_chunks):
+            if not self.is_footnote_section(chunk.content):
+                last_main_chunk = chunk
+                break
+        
+        # If all chunks are footnotes, use the last one
+        if last_main_chunk is None and final_chunks:
+            last_main_chunk = final_chunks[-1]
         
         # Create a context string with heading hierarchy and the last part of content
         context = (
             f"Previous chunk information:\n"
-            f"Heading: {last_chunk.heading}\n"
-            f"Last content: {last_chunk.content[-500:] if len(last_chunk.content) > 500 else last_chunk.content}\n"
+            f"Main Heading: {last_main_chunk.main_heading}\n"
+            f"Section Heading: {last_main_chunk.section_heading}\n"
+            f"Chunk Title: {last_main_chunk.chunk_title}\n"
+            f"Page Numbers: {last_main_chunk.page_numbers}\n"
+            f"Last content: {last_main_chunk.content[-500:] if len(last_main_chunk.content) > 500 else last_main_chunk.content}\n"
         )
         
         return context

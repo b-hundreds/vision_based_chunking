@@ -47,7 +47,9 @@ def process_pdf(pdf_path: str, output_path: str) -> str:
         # Process batch with LLM
         llm_response = llm_handler.process_batch(
             images=batch_images,
-            context=last_chunk_context
+            context=last_chunk_context,
+            batch_index=batch_index,
+            total_batches=len(batches)
         )
         
         # Parse LLM response
@@ -63,6 +65,18 @@ def process_pdf(pdf_path: str, output_path: str) -> str:
                 logger.info("First chunk in batch continues from previous batch. Merging.")
                 # Get the last chunk from previous batches
                 last_final_chunk = all_final_chunks[-1]
+                
+                # Preserve section heading information for continuing content
+                if batch_final_chunks[0].main_heading == last_final_chunk.main_heading:
+                    # Maintain section heading consistency
+                    batch_final_chunks[0].section_heading = last_final_chunk.section_heading
+                    # Update the full heading to reflect the corrected section heading
+                    batch_final_chunks[0].heading = (
+                        f"{batch_final_chunks[0].main_heading} > "
+                        f"{batch_final_chunks[0].section_heading} > "
+                        f"{batch_final_chunks[0].chunk_title}"
+                    )
+                
                 # Merge content
                 last_final_chunk.content += f"\n{batch_final_chunks[0].content}"
                 # Add page numbers
