@@ -69,6 +69,7 @@ class PostProcessor:
                     main_heading=main_heading,
                     section_heading=section_heading,
                     chunk_title=chunk_title,
+                    continues=chunk.continues,
                     page_numbers=[page_numbers[min(i, len(page_numbers) - 1)]]
                 )
                 final_chunks.append(new_chunk)
@@ -86,18 +87,22 @@ class PostProcessor:
             final_chunks: List of FinalChunk objects
             
         Returns:
-            Context string for the next batch
+            Context string for the next batch in LAST CHUNKS format
         """
         if not final_chunks:
             return ""
         
         last_chunk = final_chunks[-1]
         
-        # Create a context string with heading hierarchy and the last part of content
+        # Create LAST CHUNKS context with the new format requirements
+        # Include the last chunk's full information for continuity
         context = (
-            f"Previous chunk information:\n"
-            f"Heading: {last_chunk.heading}\n"
-            f"Last content: {last_chunk.content[-500:] if len(last_chunk.content) > 500 else last_chunk.content}\n"
+            f"LAST CHUNKS:\n"
+            f"[CONTINUES]{str(last_chunk.continues).title()}[/CONTINUES]"
+            f"[HEAD]{last_chunk.heading}[/HEAD]\n"
+            f"{last_chunk.content}\n\n"
+            f"Note: Use this information only for heading inference and content continuity. "
+            f"Do not include this content in new chunks unless it directly continues from an incomplete sentence or table row."
         )
         
         return context

@@ -44,12 +44,14 @@ class LLMHandler:
             context: Optional context information to include in the prompt
             
         Returns:
-            Formatted prompt string
+            Formatted prompt string with context prepended if available
         """
         if context:
-            return self.prompt_template.format(context=context)
+            # Prepend context information to the prompt as LAST CHUNKS
+            context_header = f"\n\n## LAST CHUNKS INFORMATION\n{context}\n\n"
+            return context_header + self.prompt_template
         else:
-            return self.prompt_template.format(context="No previous context available.")
+            return self.prompt_template
     
     def process_batch(self, images: List[Image.Image], context: Optional[str] = None) -> str:
         """
@@ -68,6 +70,9 @@ class LLMHandler:
         try:
             response = self.model.generate_content([formatted_prompt] + images)
             logger.info("Successfully received response from Gemini")
+            # Log response for debugging
+            logger.debug(f"LLM Response length: {len(response.text) if response.text else 0}")
+            logger.debug(f"LLM Response preview: {response.text[:500] if response.text else 'No response text'}...")
             return response.text
         except Exception as e:
             logger.error(f"Error calling Gemini API: {str(e)}")

@@ -19,6 +19,7 @@ class FinalChunk:
     main_heading: str
     section_heading: str
     chunk_title: str
+    continues: Union[bool, Literal["partial"]] = False
     page_numbers: List[int] = field(default_factory=list)
 
     def to_dict(self) -> dict:
@@ -30,5 +31,6 @@ class FinalChunk:
             "main_heading": self.main_heading,
             "section_heading": self.section_heading,
             "chunk_title": self.chunk_title,
+            "continues": self.continues,
             "page_numbers": self.page_numbers
         }

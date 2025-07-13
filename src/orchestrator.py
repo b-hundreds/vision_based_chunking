@@ -4,6 +4,7 @@ import logging
 from typing import List, Dict, Any
 from PIL import Image
 from tqdm import tqdm
+from datetime import datetime
 
 from src.pdf_processor import PDFProcessor
 from src.llm_handler import LLMHandler
@@ -28,6 +29,15 @@ def process_pdf(pdf_path: str, output_path: str) -> str:
     """
     logger.info(f"Starting processing of PDF: {pdf_path}")
     
+    # Create output_raw directory for saving raw LLM responses
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    output_raw_dir = os.path.join(base_dir, "output_raw")
+    os.makedirs(output_raw_dir, exist_ok=True)
+    
+    # Generate timestamp for unique filenames
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    pdf_basename = os.path.splitext(os.path.basename(pdf_path))[0]
+    
     # Initialize components
     pdf_processor = PDFProcessor(pdf_path)
     llm_handler = LLMHandler()
@@ -49,6 +59,23 @@ def process_pdf(pdf_path: str, output_path: str) -> str:
             images=batch_images,
             context=last_chunk_context
         )
+        
+        # Save raw LLM response to output_raw folder
+        raw_response_filename = f"{pdf_basename}_{timestamp}_batch_{batch_index+1:03d}.txt"
+        raw_response_path = os.path.join(output_raw_dir, raw_response_filename)
+        
+        try:
+            with open(raw_response_path, 'w', encoding='utf-8') as f:
+                f.write(f"# Raw LLM Response for Batch {batch_index+1}\n")
+                f.write(f"# PDF: {os.path.basename(pdf_path)}\n")
+                f.write(f"# Pages: {batch_page_numbers}\n")
+                f.write(f"# Timestamp: {datetime.now().isoformat()}\n")
+                f.write(f"# Batch Index: {batch_index+1}/{len(batches)}\n")
+                f.write(f"{'='*50}\n\n")
+                f.write(llm_response or "No response received")
+            logger.info(f"Raw LLM response saved to: {raw_response_path}")
+        except Exception as e:
+            logger.warning(f"Failed to save raw response for batch {batch_index+1}: {str(e)}")
         
         # Parse LLM response
         raw_chunks = chunk_parser.parse_llm_response(llm_response)
@@ -94,5 +121,6 @@ def process_pdf(pdf_path: str, output_path: str) -> str:
     
     logger.info(f"Processing complete. Generated {len(all_final_chunks)} chunks.")
     logger.info(f"Output saved to {output_path}")
+    logger.info(f"Raw LLM responses saved to {output_raw_dir} (prefix: {pdf_basename}_{timestamp})")
     
     return output_path
